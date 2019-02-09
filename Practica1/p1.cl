@@ -3,6 +3,21 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; cosine-distance (x y)
+;;; Calcula la distancia coseno de un vector de forma recursiva
+;;; Se asume que los dos vectores de entrada tienen la misma longitud.
+;;;
+;;; INPUT: x: vector, representado como una lista
+;;;         y: vector, representado como una lista
+;;; OUTPUT: distancia coseno entre x e y
+;;;
+(defun cosine-distance (x y distance-measure)
+  (let ((denominator (* (sqrt (funcall distance-measure x x)) (sqrt (funcall distance-measure y y))))) 
+  (if (= denominator 0)
+    nil
+    (- 1 (/ (funcall distance-measure x y) denominator)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; dot-product-rec (x y)
 ;;; Calcula el producto escalar de los vectores x e y de forma recursiva
 ;;; Se asume que los dos vectores de entrada tienen la misma longitud.
@@ -27,10 +42,7 @@
 ;;; OUTPUT: distancia coseno entre x e y
 ;;;
 (defun cosine-distance-rec (x y)
-  (let ((denominator (* (sqrt (dot-product-rec x x)) (sqrt (dot-product-rec y y))))) 
-  (if (= denominator 0)
-    nil
-    (- 1 (/ (dot-product-rec x y) denominator)))))
+  (cosine-distance x y #'dot-product-rec))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,10 +70,7 @@
 ;;; OUTPUT: distancia coseno entre x e y
 ;;;
 (defun cosine-distance-mapcar (x y)
-  (let ((denominator (* (sqrt (dot-product-mapcar x x)) (sqrt (dot-product-mapcar y y))))) 
-  (if (= denominator 0)
-    nil
-    (- 1 (/ (dot-product-mapcar x y) denominator)))))
+  (cosine-distance x y #'dot-product-mapcar))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -111,6 +120,7 @@
 	;;; Ordenamos una copia del vector por ser sort una función destructiva
 	(mapcar #'first (sort (copy-seq (map-vectors-cosine-distance vector lst-of-vectors confidence-level)) #'vector-order)))
 
+(print "Apartado 1.2 - Ejemplos")
 (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.5))
 (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.3))
 (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.99))
@@ -161,10 +171,25 @@
 ( defun get-vectors-category (categories texts distance-measure)
 	(mapcar (lambda (text) (get-text-category categories text distance-measure)) texts))
 
+(print "Apartado 1.3 - Ejemplos")
 (setf categories '((1 43 23 12) (2 33 54 24)))
 (setf texts '((1 3 22 134) (2 43 26 58)))
 (print (get-vectors-category categories texts #'cosine-distance-rec))
 (print  (get-vectors-category categories texts #'cosine-distance-mapcar))
+
+
+;;; Apartado 1.4 - Medición de tiempos
+(print "Apartado 1.3 - Tiempos")
+(print "HACER")
+
+(print "Apartado 1.4 - Preguntas - QUITAR NILs")
+(print (get-vectors-category '(()) '(()) #'cosine-distance-rec))
+(print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-rec))
+(print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-rec))
+(print (get-vectors-category '(()) '(()) #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-mapcar))
+(print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 2
@@ -251,9 +276,18 @@
 ;;;        lst: lista con la que se quiere combinar el elemento
 ;;;
 ;;; OUTPUT: lista con las combinacion del elemento con cada uno de los
-;;;         de la lista
+;;;         de la lista. Si alguno de los elementos es nil, devolvemos
+;;;			nil
 (defun combine-elt-lst (elt lst)
-  )
+	(if (or (null elt) (null lst))
+		nil
+		(mapcar (lambda (x) (list elt x)) lst)))
+
+(print (combine-elt-lst 'a '(1 2 3)))
+(print (combine-elt-lst '(a b) '(1 2 3)))
+(print (combine-elt-lst 'a nil))
+(print (combine-elt-lst nil nil))
+(print (combine-elt-lst nil '(a b)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; combine-lst-lst
@@ -264,8 +298,13 @@
 ;;;
 ;;; OUTPUT: producto cartesiano de las dos listas
 (defun combine-lst-lst (lst1 lst2)
-  )
+	;;; Usamos mapcan porque combine-elt-lst devuelve una lista, y mapcan concatena estas listas
+ 	(mapcan (lambda (elt) (combine-elt-lst elt lst2)) lst1))
 
+(print (combine-lst-lst '(a b c) '(1 2)))
+(print (combine-lst-lst nil nil))
+(print (combine-lst-lst '(a b c) nil))
+(print (combine-lst-lst nil '(a b c)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; combine-list-of-lsts
