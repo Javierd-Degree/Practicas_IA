@@ -75,6 +75,7 @@
 ;;;
 (defun cosine-distance-mapcar (x y)
   (cosine-distance x y #'dot-product-mapcar))
+
 (print "Apartado 1.1")
 ;;; Recursiva
 (print (cosine-distance-rec '(1 2 3) nil))
@@ -217,7 +218,7 @@
 ;;;         de menor distancia , junto con el valor de dicha distancia
 ;;;
 ( defun get-vectors-category (categories texts distance-measure)
-	(if (or (null categories) (null texts))s
+	(if (or (null categories) (null texts))
 		nil
 		(mapcar (lambda (text) (get-text-category categories text distance-measure)) texts)))
 
@@ -353,8 +354,9 @@
 		nil
 		(mapcar (lambda (x) (list elt x)) lst)))
 
+(print "Apartado 3.1")
 (print (combine-elt-lst 'a '(1 2 3)))
-(print (combine-elt-lst '(a b) '(1 2 3)))
+
 (print (combine-elt-lst 'a nil))
 (print (combine-elt-lst nil nil))
 (print (combine-elt-lst nil '(a b)))
@@ -376,7 +378,9 @@
 	;;; Usamos mapcan porque combine-elt-lst devuelve una lista, y mapcan concatena estas listas
  	(mapcan (lambda (elt) (combine-elt-lst elt lst2)) lst1))
 
+(print "Apartado 3.2")
 (print (combine-lst-lst '(a b c) '(1 2)))
+
 (print (combine-lst-lst nil nil))
 (print (combine-lst-lst '(a b c) nil))
 (print (combine-lst-lst nil '(a b c)))
@@ -426,7 +430,16 @@
 		(mapcar #'list (first lstolsts))
 		(combine-lst-lst-aux (first lstolsts) (combine-list-of-lsts (rest lstolsts)))))
 
+(print "Apartado 3.3")
+(print (combine-list-of-lsts '((a b c) (1 2))))
+(print (combine-list-of-lsts '((a b c) (+ -) (1 2))))
 
+(print (combine-list-of-lsts '(() (+ -) (1 2 3 4))))
+(print (combine-list-of-lsts '((a b c) () (1 2 3 4))))
+(print (combine-list-of-lsts '((a b c) (+ -) ())))
+(print (combine-list-of-lsts '((1 2 3 4))))
+(print (combine-list-of-lsts '(nil)))
+(print (combine-list-of-lsts nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 4
