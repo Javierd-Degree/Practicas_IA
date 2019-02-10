@@ -2,6 +2,10 @@
 ;; EJERCICIO 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 1.1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; cosine-distance (x y)
 ;;; Calcula la distancia coseno de un vector de forma recursiva
@@ -71,7 +75,33 @@
 ;;;
 (defun cosine-distance-mapcar (x y)
   (cosine-distance x y #'dot-product-mapcar))
+(print "Apartado 1.1")
+;;; Recursiva
+(print (cosine-distance-rec '(1 2 3) nil))
+(print (cosine-distance-rec '(1 0) '(0 1)))
+(print (cosine-distance-rec '(1 2 3) '(1 2 3)))
+(print (cosine-distance-rec '(1 2 3) '(-1 -2 -3)))
 
+(print (cosine-distance-rec '(1 2) '(1 2 3)))
+(print (cosine-distance-rec nil '(1 2 3)))
+(print (cosine-distance-rec '() '()))
+(print (cosine-distance-rec '(0 0) '(0 0)))
+
+;;; Mapcar
+(print (cosine-distance-mapcar '(1 2 3) nil))
+(print (cosine-distance-mapcar '(1 0) '(0 1)))
+(print (cosine-distance-mapcar '(1 2 3) '(1 2 3)))
+(print (cosine-distance-mapcar '(1 2 3) '(-1 -2 -3)))
+
+(print (cosine-distance-mapcar '(1 2) '(1 2 3)))
+(print (cosine-distance-mapcar nil '(1 2 3)))
+(print (cosine-distance-mapcar '() '()))
+(print (cosine-distance-mapcar '(0 0) '(0 0)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 1.2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; map-vectors-cosine-distance
@@ -120,25 +150,42 @@
 	;;; Ordenamos una copia del vector por ser sort una función destructiva
 	(mapcar #'first (sort (copy-seq (map-vectors-cosine-distance vector lst-of-vectors confidence-level)) #'vector-order)))
 
-(print "Apartado 1.2 - Ejemplos")
+(print "Apartado 1.2")
+(print (order-vectors-cosine-distance '(1 2 3) '((0 0 0))))
+(print (order-vectors-cosine-distance '(0 0 0) '((1 2 3))))
+(print (order-vectors-cosine-distance '(1 2 3) '((1 2 3) (2 1 1)) 0.99))
+(print (order-vectors-cosine-distance '(1 2 3) '((1 2 3) (2 1 1)) 1))
+(print (order-vectors-cosine-distance '(1 0) '((1 0) (0 1) (1 0.1) (1 0.2))))
+(print (order-vectors-cosine-distance nil '((1 2 3) (2 1 1))))
+(print (order-vectors-cosine-distance '(1 2 3) nil))
+(print (order-vectors-cosine-distance nil nil))
+
 (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.5))
 (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.3))
 (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.99))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 1.3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; get-text-category_dist
-;;; Devuelve una tupla con el id de la categoría y su distancia
-;;; al texto
+;;; Devuelve una lista con una tupla con el id de la categoría 
+;;; y su distancia al texto
 ;;;
 ;;; INPUT : category: 	lista que representa la categoría
 ;;;         text:       lista que representa al texto
 ;;;         distance-measure: funcion de distancia
-;;; OUTPUT: tupla formada por el id de la categoría y su distancia
-;;;         al texto
+;;; OUTPUT: lista con una tupla formada por el id de la categoría 
+;;;         y su distancia al texto
 ;;;
 ( defun get-text-category-dist (category text distance-measure)
-	(list (first category) (funcall distance-measure (rest text) (rest category))))
+	(let ((distance (funcall distance-measure (rest text) (rest category)))) 
+		(if (null distance)
+			nil
+			(list (list (first category) distance)))))
+	
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; get-text-category
@@ -153,7 +200,8 @@
 ;;;
 ( defun get-text-category (categories text distance-measure)
 	;;; Ordenamos una copia del vector por ser sort una función destructiva
-	(first (sort (copy-seq (mapcar (lambda (cat) (get-text-category-dist cat text distance-measure)) categories)) #'vector-order)))
+	(first (sort (copy-seq (mapcan (lambda (cat) (get-text-category-dist cat text distance-measure)) categories)) #'vector-order)))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -169,23 +217,40 @@
 ;;;         de menor distancia , junto con el valor de dicha distancia
 ;;;
 ( defun get-vectors-category (categories texts distance-measure)
-	(mapcar (lambda (text) (get-text-category categories text distance-measure)) texts))
+	(if (or (null categories) (null texts))s
+		nil
+		(mapcar (lambda (text) (get-text-category categories text distance-measure)) texts)))
 
-(print "Apartado 1.3 - Ejemplos")
+(print "Apartado 1.3")
 (setf categories '((1 43 23 12) (2 33 54 24)))
 (setf texts '((1 3 22 134) (2 43 26 58)))
+
+(print (get-vectors-category '((1 1 2) (2 2 1)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 1 2)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 0 0)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 1 2) (2 2 1)) '((1 0 0)) #'cosine-distance-mapcar))
+(print (get-vectors-category nil '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 2 1) (2 1 2)) nil #'cosine-distance-mapcar))
+(print (get-vectors-category nil nil #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 1 2 3) ()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 4 5 6) (2 2 1 3)) '(() (2 4 5 6)) #'cosine-distance-mapcar))
+(print (get-vectors-category '(() (1 4 5 6)) '(() (2 4 5 6)) #'cosine-distance-mapcar))
+
 (print (get-vectors-category categories texts #'cosine-distance-rec))
-(print  (get-vectors-category categories texts #'cosine-distance-mapcar))
+(print (get-vectors-category categories texts #'cosine-distance-mapcar))
+(print (get-vectors-category '(()) '(()) #'cosine-distance-mapcar))
+(print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-mapcar))
+(print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
 
 
 ;;; Apartado 1.4 - Medición de tiempos
-(print "Apartado 1.3 - Tiempos")
-(print "HACER")
+(print "Apartado 1.4 - Tiempos")
+(time (get-vectors-category categories texts #'cosine-distance-rec))
+(time (get-vectors-category categories texts #'cosine-distance-mapcar))
+(time (get-vectors-category '((1 43 23 12 1) (2 33 54 24 5) (3 58 32 15 93)) '((1 3 22 134 47) (2 43 26 58 69) (2 39 12 46 81)) #'cosine-distance-rec))
+(time (get-vectors-category '((1 43 23 12 1) (2 33 54 24 5) (3 58 32 15 93)) '((1 3 22 134 47) (2 43 26 58 69) (2 39 12 46 81)) #'cosine-distance-mapcar))
 
-(print "Apartado 1.4 - Preguntas - QUITAR NILs")
-(print (get-vectors-category '(()) '(()) #'cosine-distance-rec))
-(print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-rec))
-(print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-rec))
+(print "Apartado 1.4 - Preguntas")
 (print (get-vectors-category '(()) '(()) #'cosine-distance-mapcar))
 (print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-mapcar))
 (print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
@@ -268,6 +333,11 @@
 ;; EJERCICIO 3
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 3.1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; combine-elt-lst
 ;;; Combina un elemento dado con todos los elementos de una lista
@@ -289,6 +359,11 @@
 (print (combine-elt-lst nil nil))
 (print (combine-elt-lst nil '(a b)))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 3.2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; combine-lst-lst
 ;;; Calcula el producto cartesiano de dos listas
@@ -307,6 +382,37 @@
 (print (combine-lst-lst nil '(a b c)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 3.3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; combine-elt-lst-aux
+;;; Combina un elemento dado con todos los elementos de una lista
+;;;
+;;; INPUT: elem: elemento a combinar
+;;;        lst: lista con la que se quiere combinar el elemento
+;;;
+;;; OUTPUT: lista con las combinacion del elemento con cada uno de los
+;;;         de la lista, como una concatenación de ambos. 
+;;;			Si alguno de los elementos es nil, devolvemos nil
+(defun combine-elt-lst-aux (elt lst)
+	(if (or (null elt) (null lst))
+		nil
+		(mapcar (lambda (x) (cons elt x)) lst)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; combine-lst-lst-aux
+;;; Calcula el producto cartesiano de dos listas
+;;;
+;;; INPUT: lst1: primera lista
+;;;        lst2: segunda lista
+;;;
+;;; OUTPUT: producto cartesiano de las dos listas
+(defun combine-lst-lst-aux (lst1 lst2)
+	;;; Usamos mapcan porque combine-elt-lst devuelve una lista, y mapcan concatena estas listas
+ 	(mapcan (lambda (elt) (combine-elt-lst-aux elt lst2)) lst1))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; combine-list-of-lsts
 ;;; Calcula todas las posibles disposiciones de elementos
 ;;; pertenecientes a N listas de forma que en cada disposicion 
@@ -316,7 +422,9 @@
 ;;;
 ;;; OUTPUT: lista con todas las posibles combinaciones de elementos
 (defun combine-list-of-lsts (lstolsts)
-  )
+	(if (null (rest lstolsts))
+		(mapcar #'list (first lstolsts))
+		(combine-lst-lst-aux (first lstolsts) (combine-list-of-lsts (rest lstolsts)))))
 
 
 
