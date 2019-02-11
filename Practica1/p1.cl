@@ -251,73 +251,140 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 2.1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; newton
 ;;; Estima el cero de una funcion mediante Newton-Raphson
 ;;;
 ;;; INPUT : f: funcion cuyo cero se desea encontrar
-;;;         df: derivada de f
-;;;         max-iter: maximo numero de iteraciones
-;;;         x0: estimacion inicial del cero (semilla)
-;;;         tol: tolerancia para convergencia (parametro opcional)
-;;; OUTPUT: estimacion del cero de f o NIL si no converge
+;;; df: derivada de f
+;;; max-iter : maximo numero de iteraciones
+;;; x0: estimacion inicial del cero ( semilla )
+;;; tol: tolerancia para convergencia ( parametro opcional )
+;;; OUTPUT : estimacion del cero de f, o NIL si no converge
 ;;;
-( defun newton (f df max-iter x0 &optional (tol 0.001))
-  )
+(defun newton (f df max-iter x0 &optional ( tol 0.001)) 
+	(if (<= max-iter 0) 
+		NIL 
+		(let ((division (/ (funcall f x0) (funcall df x0)))) 
+			(if (<= (abs division) tol) 
+				x0
+				(newton f df (- max-iter 1) (- x0 division) tol)))))
 
+
+(print "Apartado 2.1")
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0)) 
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6 0.001)) 
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5 0)) 
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0 0.005)) 
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0 0.007)) 
+
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 3.0))
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6))
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5))
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 2.2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; one-root-newton
 ;;; Prueba con distintas semillas iniciales hasta que Newton
 ;;; converge
 ;;;
-;;; INPUT: f : funcion de la que se desea encontrar un cero
-;;;        df : derivada de f
-;;;        max-iter : maximo numero de iteraciones
-;;;        semillas : semillas con las que invocar a Newton
-;;;        tol : tolerancia para convergencia ( parametro opcional )
+;;; INPUT : f: funcion de la que se desea encontrar un cero
+;;; df: derivada de f
+;;; max-iter : maximo numero de iteraciones
+;;; semillas : semillas con las que invocar a Newton
+;;; tol: tolerancia para convergencia ( parametro opcional )
 ;;;
-;;; OUTPUT: el primer cero de f que se encuentre , o NIL si se diverge
-;;;          para todas las semillas
+;;; OUTPUT : el primer cero de f que se encuentre , o NIL si se diverge
+;;; para todas las semillas
 ;;;
-(defun one-root-newton (f df max-iter semillas &optional (tol 0.001))
-  )
+(defun one-root-newton (f df max-iter semillas &optional ( tol 0.001)) 
+	(let ((newton-res (newton f df max-iter (first semillas) tol))) 
+		(if (null newton-res) 
+			(if (null (rest semillas))
+				NIL
+				(one-root-newton f df max-iter (rest semillas) tol))
+			newton-res)))
 
+(print "Apartado 2.2")
+(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 7 '(50.0 0.6)))
+(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 7 '(3.0 50.0)))
+(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(3.0 -2.5)))
+(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5) 0))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; one-root-newton
-;;; Prueba con distintas semillas iniciales hasta que Newton
-;;; converge
-;;;
-;;; INPUT: f: funcion de la que se desea encontrar un cero
-;;;        df: derivada de f
-;;;        max-iter: maximo numero de iteraciones
-;;;        semillas : semillas con las que invocar a Newton
-;;;        tol : tolerancia para convergencia ( parametro opcional )
-;;;
-;;; OUTPUT: el primer cero de f que se encuentre, o NIL si se diverge
-;;;         para todas las semillas
-;;;
-(defun one-root-newton (f df max-iter semillas &optional ( tol 0.001))
-  )
-
+(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
+(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(3.0 -2.5)))
+(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(3.0 -2.5)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 2.3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; all-roots-newton
 ;;; Prueba con distintas semillas iniciales y devuelve las raices
 ;;; encontradas por Newton para dichas semillas
 ;;;
-;;; INPUT: f: funcion de la que se desea encontrar un cero
-;;;        df: derivada de f
-;;;        max-iter: maximo numero de iteraciones
-;;;        semillas: semillas con las que invocar a Newton
-;;;        tol : tolerancia para convergencia ( parametro opcional )
+;;; INPUT : f: funcion de la que se desea encontrar un cero
+;;; df: derivada de f
+;;; max-iter : maximo numero de iteraciones
+;;; semillas : semillas con las que invocar a Newton
+;;; tol: tolerancia para convergencia ( parametro opcional )
 ;;;
-;;; OUTPUT: las raices que se encuentren para cada semilla o nil
-;;;          si para esa semilla el metodo no converge
+;;; OUTPUT : las raices que se encuentren para cada semilla o nil
+;;; si para esa semilla el metodo no converge
 ;;;
-(defun all-roots-newton (f df tol-abs max-iter semillas &optional ( tol 0.001))
-  )
+(defun all-roots-newton (f df max-iter semillas &optional ( tol 0.001)) 
+	(let ((newton-res (newton f df max-iter (first semillas) tol))) 
+		(if (null (rest semillas))
+			(list newton-res)
+			(cons newton-res (all-roots-newton f df max-iter (rest semillas) tol)))))
 
+(print "Apartado 2.3")
+(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(-2.5 3.0 10000.0)))
+(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(-2.5 3.0 10000.0) 0))
 
+(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
+(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
+(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(0.6 3.0 -2.5)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Apartado 2.3.1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; list-not-nil-roots-newton
+;;; Quita los nil de la lista que devuelve all-roots-newton
+;;; con los parámetros pasados como argumento
+;;;
+;;; INPUT : f: funcion de la que se desea encontrar un cero
+;;; df: derivada de f
+;;; max-iter : maximo numero de iteraciones
+;;; semillas : semillas con las que invocar a Newton
+;;; tol: tolerancia para convergencia ( parametro opcional )
+;;;
+;;; OUTPUT : las raices que se encuentren para cada semilla sin nil
+;;;
+(defun list-not-nil-roots-newton (f df max-iter semillas &optional ( tol 0.001)) 
+	(mapcan (lambda (x)
+        (if (null x)   
+            '()
+            (list x)))
+        (all-roots-newton f df max-iter semillas tol)))
+
+(print "Apartado 2.3.1")
+(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
+(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
+(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(0.6 3.0 -2.5)))
+(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0) 0))
+
+(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 3
