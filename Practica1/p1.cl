@@ -126,17 +126,6 @@
 	(mapcan (lambda (v) (let ((distance (cosine-distance-mapcar v vector))) (when (and distance (<= distance (- 1 confidence-level))) (list (list v distance))))) lst-of-vectors))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; vector-order
-;;; Permite ordenar vectores de menor a mayor por el elemento 
-;;;	de la segunda posicion
-;;; INPUT:  x: primer vector
-;;;         y: segundo vector
-;;; OUTPUT: verdader si x[1] <= y[1], falso en caso contrario
-;;;
-(defun vector-order (x y)
-	(<= (second x) (second y)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; order-vectors-cosine-distance
 ;;; Devuelve aquellos vectores similares a una categoria
 ;;; INPUT:  vector: vector que representa a una categoria,
@@ -149,7 +138,7 @@
 ;;;
 (defun order-vectors-cosine-distance (vector lst-of-vectors &optional (confidence-level 0))
 	;;; Ordenamos una copia del vector por ser sort una función destructiva
-	(mapcar #'first (sort (copy-seq (map-vectors-cosine-distance vector lst-of-vectors confidence-level)) #'vector-order)))
+	(mapcar #'first (sort (copy-list (map-vectors-cosine-distance vector lst-of-vectors confidence-level)) #'> :key #'second)))
 
 (print "Apartado 1.2")
 (print (order-vectors-cosine-distance '(1 2 3) '((0 0 0))))
@@ -201,7 +190,7 @@
 ;;;
 ( defun get-text-category (categories text distance-measure)
 	;;; Ordenamos una copia del vector por ser sort una función destructiva
-	(first (sort (copy-seq (mapcan (lambda (cat) (get-text-category-dist cat text distance-measure)) categories)) #'vector-order)))
+	(first (sort (copy-list (mapcan (lambda (cat) (get-text-category-dist cat text distance-measure)) categories)) #'> :key #'second)))
 
 
 
