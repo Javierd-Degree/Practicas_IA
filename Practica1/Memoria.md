@@ -1,4 +1,6 @@
-### Prática 1 - Javier Delgado del Cerro y Javier López Cano - Pareja 2
+ *Javier Delgado del Cerro y Javier López Cano - Pareja 2*
+
+### Prática 1
 
 ### Ejercicio 1
 
@@ -177,6 +179,16 @@ En el primer caso la función devuelve 4.0 de forma exacta en la primera iteraci
 En el caso tres la función devuelva un valor muy cercano a 1, $0.99999946$,  en lugar de exactamente 1 pues $1-0.99999946 < 0.001$ que es la tolerancia introducida y por tanto el algoritmo es correcto. En el cuarto caso el resultado debe ser exacto pues la tolerancia introducida es 0.
 
 El penúltimo caso devuelve NIL como se espera ya que no encuentra una raíz que cumpla con la tolerancia pedida en las diez iteraciones que se le permite hacer.
+
+
+
+
+
+
+
+
+
+
 
 ##### Pseudocódigo
 

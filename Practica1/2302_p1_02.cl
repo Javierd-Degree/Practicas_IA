@@ -16,7 +16,7 @@
 ;;; OUTPUT: distancia coseno entre x e y
 ;;;
 (defun cosine-distance (x y distance-measure)
-  (let ((denominator (* (sqrt (funcall distance-measure x x)) (sqrt (funcall distance-measure y y))))) 
+  (let ((denominator (* (sqrt (funcall distance-measure x x)) (sqrt (funcall distance-measure y y)))))
   (if (= denominator 0)
     nil
     (- 1 (/ (funcall distance-measure x y) denominator)))))
@@ -60,9 +60,7 @@
 ;;; OUTPUT: producto escalar del vector x por el vector y
 ;;;
 (defun dot-product-mapcar (x y)
-  (if (or (null x) (null y))
-    0
-    (apply #'+ (mapcar #'* x y))))
+    (apply #'+ (mapcar #'* x y)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; cosine-distance-mapcar
@@ -107,7 +105,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; map-vectors-cosine-distance
 ;;; Devuelve una lista de tuplas de vectores con su distancia coseno
-;;; a vector, siempre que esta distancia sea menor que 
+;;; a vector, siempre que esta distancia sea menor que
 ;;; confidence-level
 ;;; INPUT:  vector: vector que representa a una categoria,
 ;;;                 representado como una lista
@@ -161,21 +159,21 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; get-text-category_dist
-;;; Devuelve una lista con una tupla con el id de la categoría 
+;;; Devuelve una lista con una tupla con el id de la categoría
 ;;; y su distancia al texto
 ;;;
 ;;; INPUT : category: 	lista que representa la categoría
 ;;;         text:       lista que representa al texto
 ;;;         distance-measure: funcion de distancia
-;;; OUTPUT: lista con una tupla formada por el id de la categoría 
+;;; OUTPUT: lista con una tupla formada por el id de la categoría
 ;;;         y su distancia al texto
 ;;;
 ( defun get-text-category-dist (category text distance-measure)
-	(let ((distance (funcall distance-measure (rest text) (rest category)))) 
+	(let ((distance (funcall distance-measure (rest text) (rest category))))
 		(if (null distance)
 			nil
 			(list (list (first category) distance)))))
-	
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; get-text-category
@@ -265,21 +263,21 @@
 ;;; tol: tolerancia para convergencia ( parametro opcional )
 ;;; OUTPUT : estimacion del cero de f, o NIL si no converge
 ;;;
-(defun newton (f df max-iter x0 &optional ( tol 0.001)) 
-	(if (<= max-iter 0) 
-		NIL 
-		(let ((division (/ (funcall f x0) (funcall df x0)))) 
-			(if (<= (abs division) tol) 
+(defun newton (f df max-iter x0 &optional ( tol 0.001))
+	(if (<= max-iter 0)
+		NIL
+		(let ((division (/ (funcall f x0) (funcall df x0))))
+			(if (<= (abs division) tol)
 				x0
 				(newton f df (- max-iter 1) (- x0 division) tol)))))
 
 
 (print "Apartado 2.1")
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0)) 
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6 0.001)) 
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5 0)) 
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0 0.005)) 
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0 0.007)) 
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0))
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6 0.001))
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5 0))
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0 0.005))
+(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0 0.007))
 
 (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 3.0))
 (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6))
@@ -289,7 +287,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Apartado 2.2
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; one-root-newton
 ;;; Prueba con distintas semillas iniciales hasta que Newton
@@ -304,9 +302,9 @@
 ;;; OUTPUT : el primer cero de f que se encuentre , o NIL si se diverge
 ;;; para todas las semillas
 ;;;
-(defun one-root-newton (f df max-iter semillas &optional ( tol 0.001)) 
-	(let ((newton-res (newton f df max-iter (first semillas) tol))) 
-		(if (null newton-res) 
+(defun one-root-newton (f df max-iter semillas &optional ( tol 0.001))
+	(let ((newton-res (newton f df max-iter (first semillas) tol)))
+		(if (null newton-res)
 			(if (null (rest semillas))
 				NIL
 				(one-root-newton f df max-iter (rest semillas) tol))
@@ -340,8 +338,8 @@
 ;;; OUTPUT : las raices que se encuentren para cada semilla o nil
 ;;; si para esa semilla el metodo no converge
 ;;;
-(defun all-roots-newton (f df max-iter semillas &optional ( tol 0.001)) 
-	(let ((newton-res (newton f df max-iter (first semillas) tol))) 
+(defun all-roots-newton (f df max-iter semillas &optional ( tol 0.001))
+	(let ((newton-res (newton f df max-iter (first semillas) tol)))
 		(if (null (rest semillas))
 			(list newton-res)
 			(cons newton-res (all-roots-newton f df max-iter (rest semillas) tol)))))
@@ -371,9 +369,9 @@
 ;;;
 ;;; OUTPUT : las raices que se encuentren para cada semilla sin nil
 ;;;
-(defun list-not-nil-roots-newton (f df max-iter semillas &optional ( tol 0.001)) 
+(defun list-not-nil-roots-newton (f df max-iter semillas &optional ( tol 0.001))
 	(mapcan (lambda (x)
-        (if (null x)   
+        (if (null x)
             '()
             (list x)))
         (all-roots-newton f df max-iter semillas tol)))
@@ -406,9 +404,9 @@
 ;;;         de la lista. Si alguno de los elementos es nil, devolvemos
 ;;;			nil
 (defun combine-elt-lst (elt lst)
-	(if (or (null elt) (null lst))
+	(if (null lst))
 		nil
-		(mapcar (lambda (x) (list elt x)) lst)))
+		(mapcar (lambda (x) (list elt x)) lst))
 
 (print "Apartado 3.1")
 (print (combine-elt-lst 'a '(1 2 3)))
@@ -453,7 +451,7 @@
 ;;;        lst: lista con la que se quiere combinar el elemento
 ;;;
 ;;; OUTPUT: lista con las combinacion del elemento con cada uno de los
-;;;         de la lista, como una concatenación de ambos. 
+;;;         de la lista, como una concatenación de ambos.
 ;;;			Si alguno de los elementos es nil, devolvemos nil
 (defun combine-elt-lst-aux (elt lst)
 	(if (or (null elt) (null lst))
@@ -475,7 +473,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; combine-list-of-lsts
 ;;; Calcula todas las posibles disposiciones de elementos
-;;; pertenecientes a N listas de forma que en cada disposicion 
+;;; pertenecientes a N listas de forma que en cada disposicion
 ;;; aparezca unicamente un elemento de cada lista
 ;;;
 ;;; INPUT: lstolsts: lista de listas
@@ -550,9 +548,73 @@
       (negative-literal-p x)))
 
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Apartado 4.1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; solve-simple-implication
+;;; Funcion que dada una implicación (=> A B) devuelve (v (! A) B).
+;;;
+;;; INPUT  : fbf - Formula bien formada (FBF) a analizar de
+;;;           la forma (=> A B).
+;;; OUTPUT : (v (! A) B)
+;;;
+(defun solve-simple-implication (fbf)
+    (list +or+ (list +not+ (second fbf)) (third fbf)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; solve-double-implication
+;;; Funcion que dada una doble implicación (<=> A B) devuelve
+;;; (^ (v (! A) B) (v (! B) A)).
+;;;
+;;; INPUT  : fbf - Formula bien formada (FBF) a analizar de
+;;;           la forma (<=> A B).
+;;; OUTPUT : (^ (v (! A) B) (v (! B) A))
+;;;
+(defun solve-double-implication (fbf)
+    (list +and+ (solve-implication fbf) (solve-implication (list (first fbf) (third fbf) (second fbf)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; solve-implication
+;;; Funcion que dada una implicación o doble implicacion
+;;; devuelve su equivalente.
+;;;
+;;; INPUT  : fbf - Formula bien formada (FBF) a analizar de
+;;;           la forma (=> A B) o (<=> A B).
+;;; OUTPUT : Equivalente de la expresion
+;;;
+(defun solve-implication (fbf)
+    (if (cond-connector-p (first fbf))
+        (solve-simple-implication fbf)
+        (solve-double-implication fbf))))
+
+(print (solve-implication '(=> A B)))
+(print (solve-double-implication '(<=> A B)))
+
+
+(defun not-connector (fbf)
+    (if (literal-p fbf)
+        fbf
+        ))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; exapand-truth-tree-aux
+;;; Función resursiva que ecibe una expresion y construye su arbol
+;;; de verdad para determinar si es SAT o UNSAT
+;;;
+;;; INPUT  : fbf - Formula bien formada (FBF) a analizar.
+;;; OUTPUT : T   - FBF es SAT
+;;;          N   - FBF es UNSAT
+;;;
+(defun exapand-truth-tree-aux (fbf)
+        )
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; truth-tree
-;;; Recibe una expresion y construye su arbol de verdad para 
+;;; Recibe una expresion y construye su arbol de verdad para
 ;;; determinar si es SAT o UNSAT
 ;;;
 ;;; INPUT  : fbf - Formula bien formada (FBF) a analizar.
