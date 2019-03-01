@@ -574,7 +574,7 @@
 ;;; OUTPUT : (^ (v (! A) B) (v (! B) A))
 ;;;
 (defun solve-double-implication (fbf)
-    (list +and+ (solve-implication fbf) (solve-implication (list (first fbf) (third fbf) (second fbf)))))
+    (list +and+ (solve-simple-implication fbf) (solve-simple-implication (list (first fbf) (third fbf) (second fbf)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; solve-implication
@@ -588,17 +588,43 @@
 (defun solve-implication (fbf)
     (if (cond-connector-p (first fbf))
         (solve-simple-implication fbf)
-        (solve-double-implication fbf))))
+        (solve-double-implication fbf)))
 
-(print (solve-implication '(=> A B)))
-(print (solve-double-implication '(<=> A B)))
+;;(print (solve-implication '(=> A B)))
+;;(print (solve-double-implication '(<=> A B)))
+
+(defun negate(fbf)
+	(if (null (rest fbf))
+		(list (cons +not+ fbf))
+		(cons (list +not+ (first fbf)) (negate (rest fbf)))))
 
 
 (defun not-connector (fbf)
-    (if (literal-p fbf)
-        fbf
-        ))
+    (cond ((positive-literal-p fbf) (list +not+ fbf))
+    	((unary-connector-p (first fbf)) (second fbf))
+    	((binary-connector-p (first fbf)) (not-connector (solve-implication fbf)))
+    	((eql +and+ (first fbf)) (cons +or+ (negate(rest fbf))))
+    	(t (cons +and+ (negate(rest fbf))))))
 
+
+(defun limpiar (fbf)
+	(cond ((literal-p fbf) fbf)
+		((binary-connector-p (first fbf)) (limpiar (solve-implication fbf)))
+		((unary-connector-p (first fbf)) (limpiar (not-connector (second fbf))))
+		(t (cons (first fbf) (mapcar (lambda (x) (limpiar x)) (rest fbf))))))
+
+
+
+(defun add-to-lists (elem lsts)
+	(if (null lsts) 
+		(list elem)
+		(add-rec elem lsts)))
+	
+
+(defun add-rec (elem lsts)
+	(cond ((null lsts) nil)
+		((literal-p (first lsts)) (cons (list elem (first lsts)) (add-rec elem (rest lsts))))
+		(t (cons (cons elem (first lsts)) (add-rec elem (rest lsts))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; exapand-truth-tree-aux
@@ -609,8 +635,37 @@
 ;;; OUTPUT : T   - FBF es SAT
 ;;;          N   - FBF es UNSAT
 ;;;
-(defun exapand-truth-tree-aux (fbf)
-        )
+(defun expand-truth-tree-aux (fbf tree)
+   (cond ((eql fbf +and+) tree)
+        ((literal-p fbf) (expand-truth-tree-aux +and+ (add-to-lists fbf tree)))
+   		((eql (first fbf) +or+) (mapcan #'(lambda (x) (expand-truth-tree-aux x tree)) (rest fbf)))
+   		((eql (first  fbf) +and+) 
+   			(if (null (second fbf))
+   				tree
+   				(expand-truth-tree-aux (cons +and+ (cddr fbf)) (expand-truth-tree-aux (second fbf) tree))))
+   		(t NIL)))
+
+
+
+
+(defun contradiction (pos neg fbf)
+	(cond ((null fbf) NIL)
+		((positive-literal-p fbf) NIL)
+		((positive-literal-p (first fbf)) 
+			(if (member (first fbf) neg)
+				t
+				(contradiction (cons (first fbf) pos) neg (rest fbf))))
+		((negative-literal-p (first fbf))
+			(if (member (second (first fbf)) pos)
+				t
+				(contradiction pos (cons (second (first fbf)) neg) (rest fbf))))
+		(t NIL)))
+
+
+(defun sat (fbf)
+	(cond ((null fbf) NIL)
+		((contradiction '() '() (first fbf)) (sat (rest fbf)))
+		(t t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; truth-tree
@@ -622,12 +677,50 @@
 ;;;          N   - FBF es UNSAT
 ;;;
 (defun truth-tree (fbf)
-  )
+	(sat (expand-truth-tree-aux (limpiar fbf) '())))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 5
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Breadth-first-search in graphs
+;;;
+(defun bfs (end queue net)
+	(if (null queue)
+		'()
+		(let* ((path (first queue))
+			(node (first path))) ;;inicio = primer(camino)
+			(if (eql node end)  
+				(reverse path) ;;si inicio == fin: devolver dar.vuelta(camino)
+				(bfs end (append (rest queue) (new-paths path node net)) net))))) ;;si no: devolver bfs(fin, concatenar(camino, vecinos(inicio, grafo)), grafo)
+
+
+(defun new-paths (path node net)
+	(mapcar #'(lambda (n)
+		(cons n path))
+		(rest (assoc node net)))) ;;resto(buscar.sublista(nodo, grafo)))
+
+
+(defun shortest-path (start end net)
+	(bfs end (list (list start)) net))
+
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;(shortest-path 'a 'f '((a d) (b d f) (c e) (d f) (e b f) (f)))
+;;	(bfs 'f '((a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
+;;		(bfs 'f '((d a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
+;;			(bfs 'f '((f d a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
+;;			-> (a d f)
+;;		-> (a d f)
+;;	-> (a d f)
+;;-> (a d f)
+
+;;(shortest-path 'b 'g '((a b c d e) (b a d e f) (c a g) (d a b g h) (e a b g h) (f b h) (g c d e h) (h d e f g)))
+;;-> (b d g)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; shortest-path-improved
@@ -639,8 +732,41 @@
 ;;; OUTPUT: camino mas corto entre dos nodos
 ;;;         nil si no lo encuentra
 
-(defun bfs-improved (end queue net)
-  )
 
-(defun shortest-path-improved (end queue net)
-  )
+
+(defun bfs-improved (end queue net)
+	(bfs-improved-aux end queue net NIL))
+
+
+(defun bfs-improved-aux (end queue net explored)
+	(if (null queue)
+		'()
+		(if (null (first queue))
+			NIL
+			(let* ((path (first queue))
+				(node (first path)))
+				(if (eql node end)
+					(reverse path)
+					(if (null (member node explored))
+						(bfs-improved end (append (rest queue) (new-paths path node net)) net (cons node explored))
+						(bfs-improved end (rest queue) net explored)))))))
+				
+
+(defun shortest-path-improved (end start net)
+  (bfs-improved end (list (list start)) net))
+
+
+
+
+
+
+;;bfs(fin camino grafo):
+;;	inicio = primer(camino)
+;;	si inicio == fin:
+;;		devolver dar.vuelta(camino)
+;;	si no:
+;;		devolver bfs(fin, concatenar(camino, vecinos(inicio, grafo)), grafo)
+
+
+;;vecinos(nodo, grafo):
+;;	devolver resto(buscar.sublista(nodo, grafo)))
