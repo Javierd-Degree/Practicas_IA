@@ -16,10 +16,13 @@
 ;;; OUTPUT: distancia coseno entre x e y
 ;;;
 (defun cosine-distance (x y distance-measure)
-  (let ((denominator (* (sqrt (funcall distance-measure x x)) (sqrt (funcall distance-measure y y)))))
-  (if (= denominator 0)
-    nil
-    (- 1 (/ (funcall distance-measure x y) denominator)))))
+  (if (and (null x) (null y))
+      0
+      (let ((denominator (* (sqrt (funcall distance-measure x x)) (sqrt (funcall distance-measure y y)))))
+      (if (= denominator 0)
+        nil
+        (- 1 (/ (funcall distance-measure x y) denominator))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; dot-product-rec (x y)
@@ -76,26 +79,25 @@
 
 (print "Apartado 1.1")
 ;;; Recursiva
-(print (cosine-distance-rec '(1 2 3) nil))
-(print (cosine-distance-rec '(1 0) '(0 1)))
-(print (cosine-distance-rec '(1 2 3) '(1 2 3)))
-(print (cosine-distance-rec '(1 2 3) '(-1 -2 -3)))
+;;; (print (cosine-distance-rec '(1 0) '(0 1)))
+;;; (print (cosine-distance-rec '(1 2 3) '(1 2 3)))
+;;; (print (cosine-distance-rec '(1 2 3) '(-1 -2 -3)))
 
-(print (cosine-distance-rec '(1 2) '(1 2 3)))
-(print (cosine-distance-rec nil '(1 2 3)))
-(print (cosine-distance-rec '() '()))
-(print (cosine-distance-rec '(0 0) '(0 0)))
+;;; (print (cosine-distance-rec '(1 2) '(1 2 3)))
+;;; (print (cosine-distance-rec nil '(1 2 3)))
+;;; (print (cosine-distance-rec '() '()))
+;;; (print (cosine-distance-rec '(0 0) '(0 0)))
 
 ;;; Mapcar
-(print (cosine-distance-mapcar '(1 2 3) nil))
-(print (cosine-distance-mapcar '(1 0) '(0 1)))
-(print (cosine-distance-mapcar '(1 2 3) '(1 2 3)))
-(print (cosine-distance-mapcar '(1 2 3) '(-1 -2 -3)))
+;;; (print (cosine-distance-mapcar '(1 2 3) nil))
+;;; (print (cosine-distance-mapcar '(1 0) '(0 1)))
+;;; (print (cosine-distance-mapcar '(1 2 3) '(1 2 3)))
+;;; (print (cosine-distance-mapcar '(1 2 3) '(-1 -2 -3)))
 
-(print (cosine-distance-mapcar '(1 2) '(1 2 3)))
-(print (cosine-distance-mapcar nil '(1 2 3)))
-(print (cosine-distance-mapcar '() '()))
-(print (cosine-distance-mapcar '(0 0) '(0 0)))
+;;; (print (cosine-distance-mapcar '(1 2) '(1 2 3)))
+;;; (print (cosine-distance-mapcar nil '(1 2 3)))
+;;; (print (cosine-distance-mapcar '() '()))
+;;; (print (cosine-distance-mapcar '(0 0) '(0 0)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -138,19 +140,19 @@
 	;;; Ordenamos una copia del vector por ser sort una función destructiva
 	(mapcar #'first (sort (copy-list (map-vectors-cosine-distance vector lst-of-vectors confidence-level)) #'> :key #'second)))
 
-(print "Apartado 1.2")
-(print (order-vectors-cosine-distance '(1 2 3) '((0 0 0))))
-(print (order-vectors-cosine-distance '(0 0 0) '((1 2 3))))
-(print (order-vectors-cosine-distance '(1 2 3) '((1 2 3) (2 1 1)) 0.99))
-(print (order-vectors-cosine-distance '(1 2 3) '((1 2 3) (2 1 1)) 1))
-(print (order-vectors-cosine-distance '(1 0) '((1 0) (0 1) (1 0.1) (1 0.2))))
-(print (order-vectors-cosine-distance nil '((1 2 3) (2 1 1))))
-(print (order-vectors-cosine-distance '(1 2 3) nil))
-(print (order-vectors-cosine-distance nil nil))
+;;; (print "Apartado 1.2")
+;;; (print (order-vectors-cosine-distance '(1 2 3) '((0 0 0))))
+;;; (print (order-vectors-cosine-distance '(0 0 0) '((1 2 3))))
+;;; (print (order-vectors-cosine-distance '(1 2 3) '((1 2 3) (2 1 1)) 0.99))
+;;; (print (order-vectors-cosine-distance '(1 2 3) '((1 2 3) (2 1 1)) 1))
+;;; (print (order-vectors-cosine-distance '(1 0) '((1 0) (0 1) (1 0.1) (1 0.2))))
+;;; (print (order-vectors-cosine-distance nil '((1 2 3) (2 1 1))))
+;;; (print (order-vectors-cosine-distance '(1 2 3) nil))
+;;; (print (order-vectors-cosine-distance nil nil))
 
-(print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.5))
-(print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.3))
-(print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.99))
+;;; (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.5))
+;;; (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.3))
+;;; (print (order-vectors-cosine-distance '(1 2 3) '((32 454 123) (133 12 1) (4 2 2)) 0.99))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -209,39 +211,39 @@
 		nil
 		(mapcar (lambda (text) (get-text-category categories text distance-measure)) texts)))
 
-(print "Apartado 1.3")
-(setf categories '((1 43 23 12) (2 33 54 24)))
-(setf texts '((1 3 22 134) (2 43 26 58)))
+;;; (print "Apartado 1.3")
+;;; (setf categories '((1 43 23 12) (2 33 54 24)))
+;;; (setf texts '((1 3 22 134) (2 43 26 58)))
 
-(print (get-vectors-category '((1 1 2) (2 2 1)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 1 2)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 0 0)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 1 2) (2 2 1)) '((1 0 0)) #'cosine-distance-mapcar))
-(print (get-vectors-category nil '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 2 1) (2 1 2)) nil #'cosine-distance-mapcar))
-(print (get-vectors-category nil nil #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 1 2 3) ()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 4 5 6) (2 2 1 3)) '(() (2 4 5 6)) #'cosine-distance-mapcar))
-(print (get-vectors-category '(() (1 4 5 6)) '(() (2 4 5 6)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 1 2) (2 2 1)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 1 2)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 0 0)) '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 1 2) (2 2 1)) '((1 0 0)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category nil '((1 2 1) (2 1 2)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 2 1) (2 1 2)) nil #'cosine-distance-mapcar))
+;;; (print (get-vectors-category nil nil #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 1 2 3) ()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 4 5 6) (2 2 1 3)) '(() (2 4 5 6)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '(() (1 4 5 6)) '(() (2 4 5 6)) #'cosine-distance-mapcar))
 
-(print (get-vectors-category categories texts #'cosine-distance-rec))
-(print (get-vectors-category categories texts #'cosine-distance-mapcar))
-(print (get-vectors-category '(()) '(()) #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-mapcar))
-(print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category categories texts #'cosine-distance-rec))
+;;; (print (get-vectors-category categories texts #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '(()) '(()) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
 
 
 ;;; Apartado 1.4 - Medición de tiempos
-(print "Apartado 1.4 - Tiempos")
-(time (get-vectors-category categories texts #'cosine-distance-rec))
-(time (get-vectors-category categories texts #'cosine-distance-mapcar))
-(time (get-vectors-category '((1 43 23 12 1) (2 33 54 24 5) (3 58 32 15 93)) '((1 3 22 134 47) (2 43 26 58 69) (2 39 12 46 81)) #'cosine-distance-rec))
-(time (get-vectors-category '((1 43 23 12 1) (2 33 54 24 5) (3 58 32 15 93)) '((1 3 22 134 47) (2 43 26 58 69) (2 39 12 46 81)) #'cosine-distance-mapcar))
+;;; (print "Apartado 1.4 - Tiempos")
+;;; (time (get-vectors-category categories texts #'cosine-distance-rec))
+;;; (time (get-vectors-category categories texts #'cosine-distance-mapcar))
+;;; (time (get-vectors-category '((1 43 23 12 1) (2 33 54 24 5) (3 58 32 15 93)) '((1 3 22 134 47) (2 43 26 58 69) (2 39 12 46 81)) #'cosine-distance-rec))
+;;; (time (get-vectors-category '((1 43 23 12 1) (2 33 54 24 5) (3 58 32 15 93)) '((1 3 22 134 47) (2 43 26 58 69) (2 39 12 46 81)) #'cosine-distance-mapcar))
 
-(print "Apartado 1.4 - Preguntas")
-(print (get-vectors-category '(()) '(()) #'cosine-distance-mapcar))
-(print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-mapcar))
-(print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
+;;; (print "Apartado 1.4 - Preguntas")
+;;; (print (get-vectors-category '(()) '(()) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance-mapcar))
+;;; (print (get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance-mapcar))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -272,17 +274,17 @@
 				(newton f df (- max-iter 1) (- x0 division) tol)))))
 
 
-(print "Apartado 2.1")
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0))
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6 0.001))
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5 0))
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0 0.005))
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0 0.007))
+;;; (print "Apartado 2.1")
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6 0.001))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5 0))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0 0.005))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 4.0 0.007))
 
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 3.0))
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6))
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5))
-(print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 3.0))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 0.6))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 30 -2.5))
+;;; (print (newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 10 100.0))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Apartado 2.2
@@ -310,15 +312,15 @@
 				(one-root-newton f df max-iter (rest semillas) tol))
 			newton-res)))
 
-(print "Apartado 2.2")
-(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 7 '(50.0 0.6)))
-(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 7 '(3.0 50.0)))
-(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(3.0 -2.5)))
-(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5) 0))
+;;; (print "Apartado 2.2")
+;;; (print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 7 '(50.0 0.6)))
+;;; (print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 7 '(3.0 50.0)))
+;;; (print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(3.0 -2.5)))
+;;; (print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5) 0))
 
-(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
-(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(3.0 -2.5)))
-(print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(3.0 -2.5)))
+;;; (print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
+;;; (print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(3.0 -2.5)))
+;;; (print (one-root-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(3.0 -2.5)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Apartado 2.3
@@ -339,18 +341,15 @@
 ;;; si para esa semilla el metodo no converge
 ;;;
 (defun all-roots-newton (f df max-iter semillas &optional ( tol 0.001))
-	(let ((newton-res (newton f df max-iter (first semillas) tol)))
-		(if (null (rest semillas))
-			(list newton-res)
-			(cons newton-res (all-roots-newton f df max-iter (rest semillas) tol)))))
+  (mapcar #'(lambda (x) (newton f df max-iter x tol)) semillas))
 
-(print "Apartado 2.3")
-(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(-2.5 3.0 10000.0)))
-(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(-2.5 3.0 10000.0) 0))
+;;; (print "Apartado 2.3")
+;;; (print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(-2.5 3.0 10000.0)))
+;;; (print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(-2.5 3.0 10000.0) 0))
 
-(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
-(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
-(print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(0.6 3.0 -2.5)))
+;;; (print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
+;;; (print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
+;;; (print (all-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(0.6 3.0 -2.5)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Apartado 2.3.1
@@ -376,13 +375,13 @@
             (list x)))
         (all-roots-newton f df max-iter semillas tol)))
 
-(print "Apartado 2.3.1")
-(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
-(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
-(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(0.6 3.0 -2.5)))
-(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0) 0))
+;;; (print "Apartado 2.3.1")
+;;; (print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 -2.5)))
+;;; (print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
+;;; (print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 1 '(0.6 3.0 -2.5)))
+;;; (print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0) 0))
 
-(print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
+;;; (print (list-not-nil-roots-newton #'(lambda(x) (* (- x 4) (- x 1) (+ x 3))) #'(lambda (x) (- (* x (- (* x 3) 4)) 11)) 20 '(0.6 3.0 10000.0)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 3
@@ -408,12 +407,12 @@
 		nil
 		(mapcar (lambda (x) (list elt x)) lst))
 
-(print "Apartado 3.1")
-(print (combine-elt-lst 'a '(1 2 3)))
+;;; (print "Apartado 3.1")
+;;; (print (combine-elt-lst 'a '(1 2 3)))
 
-(print (combine-elt-lst 'a nil))
-(print (combine-elt-lst nil nil))
-(print (combine-elt-lst nil '(a b)))
+;;; (print (combine-elt-lst 'a nil))
+;;; (print (combine-elt-lst nil nil))
+;;; (print (combine-elt-lst nil '(a b)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -432,12 +431,12 @@
 	;;; Usamos mapcan porque combine-elt-lst devuelve una lista, y mapcan concatena estas listas
  	(mapcan (lambda (elt) (combine-elt-lst elt lst2)) lst1))
 
-(print "Apartado 3.2")
-(print (combine-lst-lst '(a b c) '(1 2)))
+;;; (print "Apartado 3.2")
+;;; (print (combine-lst-lst '(a b c) '(1 2)))
 
-(print (combine-lst-lst nil nil))
-(print (combine-lst-lst '(a b c) nil))
-(print (combine-lst-lst nil '(a b c)))
+;;; (print (combine-lst-lst nil nil))
+;;; (print (combine-lst-lst '(a b c) nil))
+;;; (print (combine-lst-lst nil '(a b c)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Apartado 3.3
@@ -467,8 +466,9 @@
 ;;;
 ;;; OUTPUT: producto cartesiano de las dos listas
 (defun combine-lst-lst-aux (lst1 lst2)
-	;;; Usamos mapcan porque combine-elt-lst devuelve una lista, y mapcan concatena estas listas
- 	(mapcan (lambda (elt) (combine-elt-lst-aux elt lst2)) lst1))
+  (if (or (null lst1) (null lst2))
+    nil
+    (append (combine-elt-lst-aux (first lst1) lst2) (combine-lst-lst-aux (rest lst1) lst2))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; combine-list-of-lsts
@@ -480,20 +480,20 @@
 ;;;
 ;;; OUTPUT: lista con todas las posibles combinaciones de elementos
 (defun combine-list-of-lsts (lstolsts)
-	(if (null (rest lstolsts))
-		(mapcar #'list (first lstolsts))
+  (if (null lstolsts)
+    (list nil)
 		(combine-lst-lst-aux (first lstolsts) (combine-list-of-lsts (rest lstolsts)))))
 
-(print "Apartado 3.3")
-(print (combine-list-of-lsts '((a b c) (1 2))))
-(print (combine-list-of-lsts '((a b c) (+ -) (1 2))))
+;;; (print "Apartado 3.3")
+;;; (print (combine-list-of-lsts '((a b c) (1 2))))
+;;; (print (combine-list-of-lsts '((a b c) (+ -) (1 2))))
 
-(print (combine-list-of-lsts '(() (+ -) (1 2 3 4))))
-(print (combine-list-of-lsts '((a b c) () (1 2 3 4))))
-(print (combine-list-of-lsts '((a b c) (+ -) ())))
-(print (combine-list-of-lsts '((1 2 3 4))))
-(print (combine-list-of-lsts '(nil)))
-(print (combine-list-of-lsts nil))
+;;; (print (combine-list-of-lsts '(() (+ -) (1 2 3 4))))
+;;; (print (combine-list-of-lsts '((a b c) () (1 2 3 4))))
+;;; (print (combine-list-of-lsts '((a b c) (+ -) ())))
+;;; (print (combine-list-of-lsts '((1 2 3 4))))
+;;; (print (combine-list-of-lsts '(nil)))
+;;; (print (combine-list-of-lsts nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 4
