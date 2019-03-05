@@ -688,19 +688,19 @@
 ;;; Breadth-first-search in graphs
 ;;;
 (defun bfs (end queue net)
-	(if (null queue)
+	(if (null queue) ;;mientras Q no este vacía
 		'()
 		(let* ((path (first queue))
-			(node (first path))) ;;inicio = primer(camino)
+			(node (first path))) ;;coger primer nodo de Q
 			(if (eql node end)  
-				(reverse path) ;;si inicio == fin: devolver dar.vuelta(camino)
-				(bfs end (append (rest queue) (new-paths path node net)) net))))) ;;si no: devolver bfs(fin, concatenar(camino, vecinos(inicio, grafo)), grafo)
+				(reverse path) ;;si nodo == fin: devolver dar.vuelta(camino)
+				(bfs end (append (rest queue) (new-paths path node net)) net))))) ;;si no: se llama a si mismo añadiendo los vecinos a Q, los vecinos se cogen con new-paths.
 
 
 (defun new-paths (path node net)
 	(mapcar #'(lambda (n)
 		(cons n path))
-		(rest (assoc node net)))) ;;resto(buscar.sublista(nodo, grafo)))
+		(rest (assoc node net)))) 
 
 
 (defun shortest-path (start end net)
@@ -748,12 +748,12 @@
 				(if (eql node end)
 					(reverse path)
 					(if (null (member node explored))
-						(bfs-improved end (append (rest queue) (new-paths path node net)) net (cons node explored))
-						(bfs-improved end (rest queue) net explored)))))))
+						(bfs-improved-aux end (append (rest queue) (new-paths path node net)) net (cons node explored))
+						(bfs-improved-aux end (rest queue) net explored)))))))
 				
 
-(defun shortest-path-improved (end start net)
-  (bfs-improved end (list (list start)) net))
+(defun shortest-path-improved (start end net)
+	(bfs-improved end (list (list start)) net))
 
 
 

@@ -471,3 +471,281 @@ Una vez programada la función, comprobamos con el ejemplo dado y con nuestra ba
 | `(combine-list-of-lsts '(nil))`                   | NIL                 |
 | `(combine-list-of-lsts nil)`                      | NIL                 |
 
+### Ejercicio 4
+
+#### Apartado 4.1
+
+##### Batería de ejemplos
+
+##### Pseudocódigo
+
+```
+limpiar(fbf):
+	si fbf es un literal:
+		devolver fbf
+	si el primer elemento de fbf es un operador binario:
+		devolver limpiar(solve-implication(fbf))
+	si el primer elemento de fbf es un operador unario (not):
+		devolver limpiar(not-connector(second(fbf)))
+	si no:
+		para cada elemento (x) de rest(fbf):
+			fragmento = limpiar(x)
+			añadir fragmento a LISTA
+		añadir first(fbf a LISTA)
+		devolver LISTA
+		
+		
+		
+expand-truth-tree-aux (fbf tree):
+	si la fbf es un and:
+		devolver tree
+	si la fbf es un literal:
+		devolver expand-truth-tree-aux(+and+, add-to-lists(fbf, tree))
+	si el primer operador es un or:
+		para cada elemento (x) de rest(fbf):
+			fragmento = expand-truth-tree-aux(x, tree)
+			concatenar fragmento a LISTA
+		devolver LISTA
+	si el primer operador es un and:
+		si no hay segundo elemento en fbf:
+			devolver tree
+		si no:
+			devolver expand-truth-tree-aux(cons(+and+, cddr(fbf)),
+            	expand-truth-tree-aux(second(fbf), tree))
+	si no:
+		devolver NIL
+```
+
+Como se puede observar en este pseudocódigo estas funciones necesitan de otras funciones auxiliares para funcionar correctamente.
+
+Las funciones auxiliares para `limpiar` tienen el siguiente pseudocódigo:
+
+```
+solve-simple-implication(fbf):
+	devolver list(+or+, list(+not+, second(fbf), third(fbf)))
+
+
+solve-double-implication(fbf):
+	devolver list(+and+, solve-simple-implication fbf, 
+		solve-simple-implication(list(first(fbf), third(fbf), second(fbf)))
+
+
+solve-implication(fbf):
+	si el primer elemento de fbf es =>:
+		devolver solve-simple-implication(fbf)
+	si no:
+		devolver solve-double-implication(fbf)
+
+
+negate(fbf):
+	si fbf solo tiene 1 elemento:
+		devolver list(cons(+not+, fbf))
+	si no:
+		devolver cons(list(not, first(fbf)), negate(rest(fbf)))
+
+
+not-connector(fbf):
+	si fbf es un literal positivo:
+		devolver list(+not+, fbf)
+	si el primer elemento de fbf es un not:
+		devolver second(fbf)
+	si el primer elemento de fbf es un operador binario:
+		devolver not-connector(solve-implication(fbf))
+	si el primer elemento de fbf es un and:
+		devolver cons(+or+, negate(first(fbf)))
+	si no:
+		devolver cons(+and+, negate(rest(fbf)))
+```
+
+Y las funciones auxiliares para `expand-truth-tree-aux` tienen el siguiente pseudocódigo:
+
+```
+add-to-lists(elem, lsts):
+	si lsts está vacía:
+		devolver list(elem)
+	si no:
+		devolver add-rec(elem, lsts)
+
+
+add-rec(elem, lsts):
+	si lsts está vacía:
+		devolver NIL
+	si el primer elemento de lsts es un literal:
+		devolver cons(list(elem, first(lsts)), add-rec(elem, rest(lsts)))
+	si no:
+		devolver cons(cons(elem, first(lsts)), add-rec(elem, rest(lsts)))
+```
+
+
+
+##### Comentarios sobre la implementación
+
+#### Apartado 4.2
+
+##### Batería de ejemplos
+
+##### Pseudocódigo
+
+Para determinar si la expresión proporcionada es sat o unsat empleamos la función `truth-tree` que llama a las funciones del apartado anterior para limpiar la expresión y crear el árbol, así como a otra función nueva llamada `sat` que determina si el árbol es sat o no; esta última emplea a su vez una función auxiliar llamada `contradiction` que recibe una rama del árbol y determina si hay o no contradicciones en ella.
+
+El pseudocódigo de estas funciones es:
+
+```
+truth-tree(fbf):
+	devolver sat(expand-truth-tree-aux(limpiar fbf) NIL)
+
+
+sat(fbf):
+	si fbf está vacía:
+		devolver NIL
+	si contradiction(NIL, NIL, first(fbf)) es true:
+		devolver sat(rest(fbf))
+	si no:
+		devolver true
+
+
+contradiction(pos, neg, fbf):
+	si fbf está vacía:
+		devolver NIL
+	si fbf es un literal:
+		devolver NIL
+	si el primer elemento de fbf es un literal positivo:
+		si pertenece a neg:
+			devolver true
+		si no:
+			añadir elemento a pos
+			devolver contradiction(pos, neg, rest(fbf))
+	si el primer elemento de fbf es un literal negativo:
+		si pertenece a pos:
+			devolver true
+		si no:
+			añadir elemento (sin la negación) a neg
+			devolver contradiction(pos, neg, rest(fbf))
+	si no:
+		devolver NIL
+```
+
+##### Comentarios sobre la implementación
+
+##### Preguntas
+
+###### 1)  si en lugar de (∧ A (∨ B C)) tuviésemos (∧ A (¬ A) (∨ B C)), ¿qué sucedería?
+
+Como A y (¬A) son incompatibles (^ A (¬A)) no es puede cumplirse, por lo que `truth-tree` devolverá `NIL`.
+
+###### 2)¿Y en el caso de (∧ A (∨ B C)(¬ A))?
+
+De nuevo para que esa expresión se cumpla debe cumplirse (^ A (¬A)) que es imposible, por lo que de nuevo se devolverá `NIL`.
+
+###### 3) estudia la salida del trace mostrada más arriba. ¿Qué devuelve la función expand-truth-tree?
+
+La función `expand-truth-tree` devuelve como va evolucionando cada una de las ramas del árbol de verdad según este se va expandiendo.
+
+### Ejercicio5
+
+#### Apartado 5.1
+
+##### Casos especiales
+
+##### Casos Típicos
+
+#### Apartado 5.2
+
+El pseudocódigo del algoritmo BFS es:
+
+```
+BFS(grafo, inicio, destino):
+	Q = nueva-cola()
+	lista_explorados = nueva-lista()
+	añadir inicio a Q
+	mientras Q no esté vacía:
+		sacar el primer nodo de Q 
+		si nodo == destino:
+			devolver ÉXITO
+		para cada vecino de nodo:
+			si vecino no esta en lista_explorados:
+			añadir vecino a Q
+		añadir nodo a lista_explorados
+	devolver FALLO
+```
+
+#### Apartado 5.5
+
+La función:
+
+```commonlisp
+(defun shortest-path (start end net) 
+    (bfs end (list (list start)) net)
+```
+
+Soluciona el problema de encontrar el camino más corto entre 2 nodos del grafo ya que realiza el algoritmo bfs en el grafo estableciendo como elemento inicial de Q el nodo desde el que se quiere iniciar, haciendo que el primer elemento que se extraiga de Q en el algoritmo sea este primero, de modo que el algoritmo comience en este nodo y termine en el nodo que se introduzca como end.
+
+#### Apartado 5.6
+
+La secuencia de llamadas que produce la evaluación:
+
+```commonlisp
+(shortest-path 'a 'f '((a d) (b d f) (c e) (d f) (e b f) (f)))
+```
+
+es:
+
+```commonlisp
+(shortest-path 'a 'f '((a d) (b d f) (c e) (d f) (e b f) (f)))
+	(bfs 'f '((a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
+		(bfs 'f '((d a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
+			(bfs 'f '((f d a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
+			-> (a d f)
+		-> (a d f)
+	-> (a d f)
+-> (a d f)
+```
+
+obteniendo, finalmente que el camino más corto para este grafo entre los nodos a y f es (a d f).
+
+#### Apartado 5.7
+
+Para hallar el camino más corto en el grafo propuesto entre los nodos B y G se debe realizar la siguiente llamada:
+
+```commonlisp
+(shortest-path 'b 'g '((a b c d e) (b a d e f) (c a g) (d a b g h) (e a b g h) (f b h) (g c d e h) (h d e f g)))
+```
+
+y esta llamada produce la salida (b d g), que, efectivamente es el camino más corto.
+
+#### Apartado 5.8
+
+##### Ejemplo
+
+##### Batería de ejemplos
+
+##### Pseudocódigo
+
+El pseudocódigo de esta nueva implementación es:
+
+```
+bfs-improved-aux(end, queue, net, explored)
+	si queue está vacía:
+		devolver lista vacía
+	si la primera sublista de queue está vacía
+		devolver NIL
+	si no:
+		path = primer elemento de queue
+		node = primer elemento de path
+		si node == end:
+			devolver dar-vuelta(path)
+		si node pertenece a explored:
+			devolver bfs-improved-aux(end, concatenar(rest(queue), new-paths(path,
+				node, net), net, cons(node, explored))
+		si no:
+			devolver bfs-improved-aux(end, rest(queue), net, explored)
+```
+
+Donde la función new-paths es la misma que en el caso anterior.
+
+##### Comentarios sobre la implementación
+
+
+
+
+
