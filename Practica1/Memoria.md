@@ -180,16 +180,6 @@ En el caso tres la función devuelva un valor muy cercano a 1, $0.99999946$,  en
 
 El penúltimo caso devuelve NIL como se espera ya que no encuentra una raíz que cumpla con la tolerancia pedida en las diez iteraciones que se le permite hacer.
 
-
-
-
-
-
-
-
-
-
-
 ##### Pseudocódigo
 
 ```
@@ -776,6 +766,27 @@ y esta llamada produce la salida (b d g), que, efectivamente es el camino más c
 #### Apartado 5.8
 
 ##### Ejemplo
+
+Para dar un ejemplo de que el algoritmo empleado en los apartados anteriores da error para grafos con bucles ya que entra en una recursión infinita vamos a probar a ejecutar el siguiente ejemplo:
+
+```
+;;Grafo inconexo con ciclos donde el destino no esta conectado al origen
+(shortest-path 'a 'f '((a b c) (b a d) (c a e) (d b e) (e c d) (f))))
+```
+
+Al probar a ejecutar este algoritmo en allegro obtenemos el siguiente error:
+
+
+
+![1551896890124](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551896890124.png)
+
+
+
+Esto se debe a que al no controlar si el nodo que se está expandiendo ha sido ya explorado o no, el algoritmo entra en un bucle infinito, y allegro, tras 1000 iteraciones determina que es un bucle infinito y devuelve este error.
+
+Por tanto es necesario implementar un nuevo código que solucione este fallo teniendo en cuenta que nodos han sido ya explorados con anterioridad para evitar bucles infinitos.
+
+
 
 ##### Batería de ejemplos
 
