@@ -646,6 +646,17 @@
    		(t NIL)))
 
 
+;;(print (limpiar '(! (<=> (! (^ (! a) b (v c d))) (!(v a (! b c))))))) 
+;;->(V (^ (V A (! B) (^ (! C) (! D))) (V A (! B))) (^ (^ (! A) B) (^ (! A) B (V C D))))
+
+;;(print (limpiar NIL)) -> NIL
+
+;;(print (expand-truth-tree-aux (limpiar '(! (<=> (! (^ (! a) b (v c d))) (!(v a (! b c)))))) NIL))
+;;->((A A) (A (! B)) (A (! D) (! C)) ((! B) A) ((! B) (! B)) ((! B) (! D) (! C)) (C B (! A) B (! A)) (D B (! A) B (! A)))
+
+;;(print (expand-truth-tree-aux NIL)) -> NIL
+
+
 
 
 (defun contradiction (pos neg fbf)
@@ -680,6 +691,11 @@
 	(sat (expand-truth-tree-aux (limpiar fbf) '())))
 
 
+;;(print (truth-tree '(^ (v a (! b)) (v (! a) b)))) -> T
+;;(print (truth-tree '(^ (v a (! b)) (v (! a) b) c (! c)))) -> NIL
+;;(print (truth-tree NIL)) -> NIL
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; EJERCICIO 5
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -711,12 +727,6 @@
 
 
 ;;(shortest-path 'a 'f '((a d) (b d f) (c e) (d f) (e b f) (f)))
-;;	(bfs 'f '((a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
-;;		(bfs 'f '((d a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
-;;			(bfs 'f '((f d a)) '((a d) (b d f) (c e) (d f) (e b f) (f)))
-;;			-> (a d f)
-;;		-> (a d f)
-;;	-> (a d f)
 ;;-> (a d f)
 
 ;;(shortest-path 'b 'g '((a b c d e) (b a d e f) (c a g) (d a b g h) (e a b g h) (f b h) (g c d e h) (h d e f g)))
@@ -756,17 +766,10 @@
 	(bfs-improved end (list (list start)) net))
 
 
+;;(print (shortest-path-improved 'a 'f '((a b c) (b a d) (c a e) (d b e) (e  d) (f)))) -> NIL
+;;(print (shortest-path-improved 'a 'f '((a b c) (b a d) (c a) (d b e) (e d)))) -> NIL
+;;(print (shortest-path-improved 'f 'a '((a b c) (b a d) (c a) (d b e) (e d) (f)))) -> NIL
+;;(print (shortest-path-improved 'a 'f '((a b c) (b a d) (c a e) (d b e) (e c d f) (f e)))) -> (a c e f)
+;;(print (shortest-path-improved 'a 'f '((a b c) (b a d f) (c a e) (d b e) (e c d f) (f e b)))) -> (a b f)
+;;(print (shortest-path-improved 'a 'f NIL)) -> NIL
 
-
-
-
-;;bfs(fin camino grafo):
-;;	inicio = primer(camino)
-;;	si inicio == fin:
-;;		devolver dar.vuelta(camino)
-;;	si no:
-;;		devolver bfs(fin, concatenar(camino, vecinos(inicio, grafo)), grafo)
-
-
-;;vecinos(nodo, grafo):
-;;	devolver resto(buscar.sublista(nodo, grafo)))

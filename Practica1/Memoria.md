@@ -451,8 +451,6 @@ combine-list-of-lsts (lstolsts):
 	devolver combine-lst-lst(primer elem lstolsts, combine-list-of-lsts(resto lstolsts))	
 ```
 
-Sin embargo, como este código 
-
 ##### Comentarios sobre la implementación
 
 Sin embargo, en la implementación nos encontramos con un pequeño problema, y es que la función `combine-elt-lst` crea una lista para cada par, lo que cumple las especificaciones pedidas para el apartado 3.1, sin embargo, al usar dicha función en este tercer apartado, necesitaríamos concatenar el par en otra lista, obteniento así una única lista con dos elementos, y no una lista con dos sublistas.
@@ -476,6 +474,23 @@ Una vez programada la función, comprobamos con el ejemplo dado y con nuestra ba
 #### Apartado 4.1
 
 ##### Batería de ejemplos
+Para probar el correcto funcionamiento del código pedido en este apartado basta con un ejemplo que contenga todos las combinaciones de operadores que se deban simplificar así como negaciones en un ámbito mayor al de un literal negativos. De este modo podremos saber si las 2 funciones principales implementadas para este apartado (`limpiar` y `expand-truth-tree-aux`) realizan el procedimiento requerido de forma adecuada. Además de este ejemplo "completo" se deben probar también el caso especial de una expresión vacía (`NIL`). Damos por supuesto que las expresiones que se pasan a estas funciones están bien formadas y, por tanto, los casos en que no lo estén no se comprueban. 
+
+Basándonos en estos requisitos hemos creado la siguiente batería de ejemplos:
+
+```commonlisp
+(limpiar '(! (<=> (! (^ (! a) b (v c d))) (!(v a (! b c)))))) 
+->(V (^ (V A (! B) (^ (! C) (! D))) (V A (! B))) (^ (^ (! A) B) (^ (! A) B (V C D))))
+
+(limpiar NIL) -> NIL
+
+(expand-truth-tree-aux (limpiar '(! (<=> (! (^ (! a) b (v c d))) (!(v a (! b c)))))) NIL)
+->((A A) (A (! B)) (A (! D) (! C)) ((! B) A) ((! B) (! B)) ((! B) (! D) (! C)) (C B (! A) B (! A)) (D B (! A) B (! A)))
+
+(expand-truth-tree-aux NIL) -> NIL
+```
+
+No incluimos "=>" en la expresión completa para probar el funcionamiento ya que no es necesario porque estos están incluidos en el bicondicional ("<=>").
 
 ##### Pseudocódigo
 
@@ -580,13 +595,45 @@ add-rec(elem, lsts):
 		devolver cons(cons(elem, first(lsts)), add-rec(elem, rest(lsts)))
 ```
 
-
-
 ##### Comentarios sobre la implementación
+
+Para implementar el funcionamiento pedido hemos decidido emplear 2 funciones principales, `limpiar`, que emplea reglas de inferencia para eliminar los condicionales y bicondicionales y reduce las negaciones al menor ámbito posible, es decir, a literales negativos; y `expand-truth-tree-aux` que recibe la expresión "limpiada" y genera a partir de ella el árbol de verdad correspondiente.
+
+Para implementar la función `limpiar` hemos creado varias funciones auxiliares.
+
+En primer lugar `solve-simple-implication` transforma una expresión con un condicional simple en su equivalente (¬A v B), del mismo modo `solve-double-implication` llama 2 veces a la función `solve-simple-impication` para resolver los bicondicionales como si fuesen 2 condicionales simples, por último `solve-implication` determina si la expresión es un condicional o un doble condicional y llama a la función correspondiente para resolverlo.
+
+Para resolver las negaciones de modo que se reduzcan al menor ámbito posible hemos creado la función `not-connector` que recibe la expresión interior de un "not" (es decir, la fbf sin el not), y la resuelve de la manera conveniente. Si la expresión es un or, la transforma en la negación de los ands, si es un and, en la negación de los ors y si es otra negación, elimina la doble negación. Para facilitar el caso de los or y and esta función llama a otra `negate` que recibe una lista de expresiones y las niega todas.
+
+Finalmente la función `limpiar` determina si la expresión general (la más amplia) es un or, un and, un condicional o un bicondicional y llama a la función correspondiente para resolverlo, esta función luego se va llamando a sí misma recursivamente para repetir el proceso con las subexpresiones interiores de menor ámbito, obteniendo finalmente la expresión sin condicionales y con negaciones solo en literales negativos.
+
+Para implementar `expand-truth-tree-aux` también hemos empleado una función auxiliar `add-to-lists` a la que se le pasa un elemento y una lista de expresiones y añade el elemento a todas las expresiones de la lista. Si la lista es `NIL` la función devuelve `NIL`, y si no llama a otra función auxiliar `add-rec` que emplea recursión para ir añadiendo el elemento a todas las sub-listas.
+
+Finalmente `expand-truth-tree-aux` recibe la expresión que debe expandir y un "árbol" inicialmente vacío que va rellenando y que al final será el árbol de verdad de la expresión. En primer lugar la función determina si la expresión ya "limpia" es un and, un `or` o un literal. Si es un literal añade este al árbol resultado (con `add-to-lists`) y se llama a si misma con este árbol y con la expresión `^` que es el caso base, si la expresión es `^` se devuelve el árbol que se tenga (`tree`), si es un `or` emplea un `mapcan` para "expandir" (llamándose a si misma) cada una de las sub-expresiones del `or`, y si es un and, emplea recursión para expandir los subelementos.
+
+El caso del and, que es el más complicado, es el que necesita explicarse con más detalle. En caso de que la expresión sea un and,  la función se llama de nuevo a sí misma con `fbf` la misma expresión sin el primer elemento del and, es decir si la expresión era `(^ a b c d)` el nuevo `fbf` será `(^ b c d)`, y se establece como `tree` otra llamada a la función `expand-truth-tree-aux` con `fbf` el elemento que hemos extraído de la lista (en el caso del ejemplo la "a"), y con `tree`el árbol que teníamos. De este modo se van evaluando y expandiendo 1 a 1 las distintas sub-expresiones del and y se van añadiendo al árbol.
+
+Mediante esta implementación acabamos consiguiendo un árbol de verdad con el formato:
+
+```
+((a b c d...) ( e f g h...)...)
+```
+
+donde cada uno de los elementos de la lista externa es una de las ramas del árbol de verdad y cada uno de los elementos de las listas internas (las letras) son los literales (que pueden ser tanto positivos como negativos) que deben cumplirse (todos) para que dicha rama no tenga contradicciones.
 
 #### Apartado 4.2
 
 ##### Batería de ejemplos
+
+Para probar la correcta implementación del algoritmo pedido debemos comprobar que la función implementada `truth-tree` funcione correctamente. Para ello, sabiendo que las funciones del apartado 4.1 son correctas, tan solo sería necesario probar 2 ejemplos, uno sat y otro unsat de modo que veamos si la función determina correctamente si son posibles o no. Además probamos también el caso especial de que la expresión que se le pase a la función sea `NIL`.
+
+Con este fin hemos desarrollado la siguiente batería de ejemplos:
+
+```commonlisp
+(truth-tree '(^ (v a (! b)) (v (! a) b))) -> T
+(truth-tree '(^ (v a (! b)) (v (! a) b) c (! c))) -> NIL
+(truth-tree NIL) -> NIL
+```
 
 ##### Pseudocódigo
 
@@ -631,6 +678,14 @@ contradiction(pos, neg, fbf):
 ```
 
 ##### Comentarios sobre la implementación
+
+Para implementar el algoritmo que determine si una expresión es sat o no hemos implementado la función `truth-tree` que llama a las funciones `expand-truth-tree-aux` y `limpiar` del apartado anterior para generar el árbol de verdad correspondiente a la expresión, y tras esto llama a otra función auxiliar `sat` que determina si este árbol es sat o no.
+
+Para determinar si un árbol es sat o no, la función `sat` comprieba si el árbol es `NIL` y si lo es devuelve `NIL`, tras esto comprueba si la primera rama del árbol (el primer elemento de la lista con el formato explicado en el apartado anterior) tiene contradicciones a través de la función auxiliar `contradiction` explicada a continuación, y si no las tiene determina que el árbol es sat devolviendo T, y de lo contrario se llama de nuevo a sí misma con el resto del árbol (el árbol sin la primera rama ya estudiada).
+
+Para determinar si hay contradicciones en una rama, la función `contradiction` emplea una lista `pos` donde almacena los literales positivos que hay en la rama y otra lista `neg` donde almacena los negativos (sin la negación), ambas listas comienzan estando vacías. En primer lugar la función comprueba si la rama está vacía y si lo está devuelve `NIL` (caso base), tras esto comprueba si la rama es un literal (ya sea positivo o negativo) y si lo es devuelve `NIL` (pues no hay contradicciones). Si no se trata de un literal, comprueba si el primer elemento de la rama es un literal positivo, y si lo es  mira si está en la lista de negativos `neg`, si lo está implica que en la misma rama está el mismo literal negado y no negado y por tanto hay una contradicción por lo que devuelve T, si por el contrario no pertenece a `neg` no hay contradicción en la rama por el momento y la función se llama a sí misma con el resto de la rama (sin el elemento ya analizado) añadiendo este elemento a la lista de  positivos `pos`. Si por el contrario el elemento es un literal negativo, comprueba si está en la lista de positivos `pos`, si está hay contradicción y devuelve T, y si nó se llama a sí misma de la misma forma que en el caso anterior pero añadiendo el elemento a la lista `neg` en lugar de a la de positivos (en este caso sin añadir la negación, se añade solo la parte positiva del literal para facilitar la comparación). De este modo consigue saber si la rama tiene o no comparaciones pues cuando la rama acaba, la función se llamará a sí misma con `NIL` como rama y devolverá `NIL` (como debe ser pues no hay contradicciones). Permitiendo a `sat` saber si hay contradicciones o no para determinar si el árbol es sat o unsat.
+
+Finalmente `truth-tree` devuelve el resultado de la función `sat` sobre el árbol que genera `expand-truth-tree-aux` a partir de la expresión ya "limpia" gracias a `limpiar`.
 
 ##### Preguntas
 
@@ -724,6 +779,30 @@ y esta llamada produce la salida (b d g), que, efectivamente es el camino más c
 
 ##### Batería de ejemplos
 
+Para probar el correcto funcionamiento de la modificación pedida del algoritmo bfs, hemos diseñado la siguiente batería de ejemplos:
+
+```commonlisp
+;;Grafo inconexo con ciclos donde el destino no esta conectado al origen
+(shortest-path-improved 'a 'f '((a b c) (b a d) (c a e) (d b e) (e c d) (f)))) -> NIL
+
+;;Grafo con ciclos donde el destino no es un nodo del grafo
+(shortest-path-improved 'a 'f '((a b c) (b a d) (c a) (d b e) (e d))) -> NIL
+                        
+;;Grafo con ciclos donde el origne no pertenece al grafo
+(shortest-path-improved 'f 'a '((a b c) (b a d) (c a) (d b e) (e d))) -> NIL
+                        
+;;Grafo con ciclos y un solo camino entre origen y destino
+(shortest-path-improved 'a 'f '((a b c) (b a d) (c a e) (d b e) (e c d f) (f e)))      -> (a c e f)
+                        
+;;Grafo con ciclos y varios caminos entre origen y destino
+(shortest-path-improved 'a 'f '((a b c) (b a d f) (c a e) (d b e) (e c d f) (f e b)))  -> (a b f)
+                        
+;;Grafo nulo (vacío)
+(shortest-path-improved 'a 'f NIL) -> NIL
+```
+
+
+
 ##### Pseudocódigo
 
 El pseudocódigo de esta nueva implementación es:
@@ -749,6 +828,10 @@ bfs-improved-aux(end, queue, net, explored)
 Donde la función new-paths es la misma que en el caso anterior.
 
 ##### Comentarios sobre la implementación
+
+Para implementar este nuevo funcionamiento se ha decidido partir del código para el bfs que se nos proporcionaba y hacerle una simple modificación que consiste en añadir un nuevo parámetro llamado `explored` que es una lista donde vamos añadiendo los nodo que ya han sido explorados, de este modo antes de llamar recursivamente a la función (es decir, antes de explorar los vecinos de un nodo) comprobamos si el nodo en el que estamos está o no en la lista de explorados, si está, llamamos a la función de nuevo pero sin el primer elemento de `queue` (el camino que se está estudiando en ese momento), y si no está lo añadimos a la lista y llamamos a la función de forma recursiva del mismo modo que en el método "no mejorado" de bfs.
+
+De este modo evitamos que la función pueda evaluar caminos que pasen 2 veces por el mismo nodo (formando un ciclo) pues estos caminos nunca van a ser la solución óptima de bfs.
 
 
 
