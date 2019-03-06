@@ -482,7 +482,7 @@
 (defun combine-list-of-lsts (lstolsts)
   (if (null lstolsts)
     (list nil)
-		(combine-lst-lst-aux (first lstolsts) (combine-list-of-lsts (rest lstolsts)))))
+	(combine-lst-lst-aux (first lstolsts) (combine-list-of-lsts (rest lstolsts)))))
 
 ;;; (print "Apartado 3.3")
 ;;; (print (combine-list-of-lsts '((a b c) (1 2))))

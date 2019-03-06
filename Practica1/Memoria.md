@@ -52,7 +52,7 @@ Para desarrollar las funciones `cosine-distance-rec` y `cosine-distance-mapcar` 
 | ----------------------------------- | --------------------- | ----------------- |
 | `(cosine-distance '(1 2) '(1 2 3))` | 0.40238577            | 0.40238577        |
 | `(cosine-distance nil '(1 2 3))`    | NIL                   | NIL               |
-| `(cosine-distance '() '())`         | NIL                   | NIL               |
+| `(cosine-distance '() '())`         | 0                     | 0                 |
 | `(cosine-distance '(0 0) '(0 0))`   | NIL                   | NIL               |
 
 #### Apartado 1.2
@@ -103,7 +103,7 @@ Como era de esperar.
 
 ##### Batería de ejemplos
 
-De nuevo, evitamos probar las expresiones que se piden posteriormente y están explicdas en la tabla del apartado 1.4. Además, usamos la expresión `cosine-distance` por ser el resultado independiente del uso de la función recursiva o la función con mapcar. La batería de ejemplos sería entonces:
+De nuevo, evitamos probar las expresiones que se piden posteriormente y están explicadas en la tabla del apartado 1.4. Además, usamos la expresión `cosine-distance` por ser el resultado independiente del uso de la función recursiva o la función con mapcar. La batería de ejemplos sería entonces:
 
 ```commonlisp
 (get-vectors-category '((1 1 2) (2 2 1)) '((1 2 1) (2 1 2)) #'cosine-distance) ;;; --> ((2 0.0) (1 0.0)) 
@@ -115,7 +115,7 @@ De nuevo, evitamos probar las expresiones que se piden posteriormente y están e
 (get-vectors-category nil nil #'cosine-distance) ;;; --> NIL
 (get-vectors-category '((1 1 2 3) ()) '((1 1 2 3) (2 2 4 6)) #'cosine-distance) ;;; --> ((1 0) (1 0.02536)) 
 (get-vectors-category '((1 4 5 6) (2 2 1 3)) '(() (2 4 5 6)) #'cosine-distance) ;;; --> (NIL (1 0.0))
-(get-vectors-category '(() (1 4 5 6)) '(() (2 4 5 6)) #'cosine-distance) ;;; --> (NIL (1 0.0))
+(get-vectors-category '(() (1 4 5 6)) '(() (2 4 5 6)) #'cosine-distance) ;;; --> ((NIL 0) (1 0.0))
 ```
 
 Consideramos que en el caso 3 y 4 tiene que devolver listas de NIL, pues aunque ambas listas con válidas (las te categorías y las de textos), ninguno de los textos tiene una categoría que se le pueda asociar.
@@ -152,7 +152,7 @@ Además, para los ejemplos planteados obtenemos los siguientes resultados:
 
 | Expresión                                                    | Evaluación         |
 | ------------------------------------------------------------ | ------------------ |
-| `(get-vectors-category '(()) '(()) #'cosine-distance)`       | (NIL)              |
+| `(get-vectors-category '(()) '(()) #'cosine-distance)`       | ((NIL 0))          |
 | `(get-vectors-category '((1 4 2) (2 1 2)) '((1 1 2 3)) #'cosine-distance)` | `((2 0.40238577))` |
 | `(get-vectors-category '(()) '((1 1 2 3) (2 4 5 6)) #'cosine-distance)` | (NIL NIL)          |
 
@@ -442,23 +442,23 @@ De nuevo, todas las expresiones que pueden dar lugar a algún tipo de conflicto 
 
 ##### Pseudo-código
 
-Una vez desarrollada la función del aparado anterior, basta con utilizar una recursión cuyo caso base sea el caso en el que `lstolsts` tiene únicamente un elemento, pues en dicho caso el resultado sería, usando un ejemplo, `(combine-list-of-lsts '((a b c))) --> ((A) (B) (C))`
+Una vez desarrolladas las funciones de los dos apartados anteriores, pensamos en usar simplemente una recursión cuyo caso base sea el caso en el que `lstolsts` tiene únicamente un elemento, pues en dicho caso el resultado sería, usando un ejemplo, `(combine-list-of-lsts '((a b c))) --> ((A) (B) (C))`
 
 ```
 combine-list-of-lsts (lstolsts):
-	si elementos(lstolsts) == 1:
-		para cada item en primer elem lstolsts:
-			 resultado.añadir(lista(item))
-		devolver resultado
+	si elementos(lstolsts) == 0:
+		devolver lista_vacia
 	devolver combine-lst-lst(primer elem lstolsts, combine-list-of-lsts(resto lstolsts))	
 ```
+
+Sin embargo, como este código 
 
 ##### Comentarios sobre la implementación
 
 Sin embargo, en la implementación nos encontramos con un pequeño problema, y es que la función `combine-elt-lst` crea una lista para cada par, lo que cumple las especificaciones pedidas para el apartado 3.1, sin embargo, al usar dicha función en este tercer apartado, necesitaríamos concatenar el par en otra lista, obteniento así una única lista con dos elementos, y no una lista con dos sublistas.
 > Un ejemplo sería: queremos obtener `(A + 1)`, pero con la función actual obtenemos `(A (+ (1)))`. Como hemos dicho, la solución pasaría por concatenar los elementos (función `cons`) en vez de crear una lista, pero esto no cumpliría el formato de salida pedido en el enunciado para esta función, pues el resultado de evaluar `(combine-elt-lst 'a '(1 2 3))` sería `((A . 1) (A . 2) (A . 3))` en vez de `((A 1) (A 2) (A 3))`.
 
-Por tanto, creamos dos nuevas funciones auxiliares, una `combine-elt-lst-aux` que simplemente implementa esta concatenación, y otra `combine-elt-lst-aux` cuya función es la misma que `combine-elt-lst` pero llamando en este caso a `combine-elt-lst-aux`.
+Además, el usar mapcan en  `combine-lst-lst` haría que el tercer apartado fuese tremendamente ineficiente. Por tanto, creamos dos nuevas funciones auxiliares, una `combine-elt-lst-aux` que simplemente implementa esta concatenación, y otra `combine-elt-lst-aux` cuya función es la misma que `combine-elt-lst` pero llamando en este caso a `combine-elt-lst-aux` de forma recursiva.
 
 Una vez programada la función, comprobamos con el ejemplo dado y con nuestra batería de ejemplos que funciona correctamente, y la evaluación sobre las expresiones pedidas sería:
 
@@ -479,6 +479,8 @@ Una vez programada la función, comprobamos con el ejemplo dado y con nuestra ba
 
 ##### Pseudocódigo
 
+Para la realización de este apartado hemos utilizado dos funciones principales, una función `limpiar` que se encarga de eliminar todas las implicaciones y dobles implicaciones usando las leyes de De Morgan y reduce el ámbito de todas las negaciones al mínimo posible. Su pseudocódigo sería el siguiente.
+
 ```
 limpiar(fbf):
 	si fbf es un literal:
@@ -494,8 +496,10 @@ limpiar(fbf):
 		añadir first(fbf a LISTA)
 		devolver LISTA
 		
-		
-		
+```
+
+La segunda función principal recibe la base de conocimiento tras ser procesada por la función `limpiar`, y se encarga de crear el árbol a partir de ésta entrada. Su pseudocódigo sería:.
+```	
 expand-truth-tree-aux (fbf tree):
 	si la fbf es un and:
 		devolver tree
@@ -516,7 +520,7 @@ expand-truth-tree-aux (fbf tree):
 		devolver NIL
 ```
 
-Como se puede observar en este pseudocódigo estas funciones necesitan de otras funciones auxiliares para funcionar correctamente.
+Por último, como se puede observar en este pseudocódigo, estas funciones necesitan de otras funciones auxiliares para funcionar correctamente.
 
 Las funciones auxiliares para `limpiar` tienen el siguiente pseudocódigo:
 
@@ -586,15 +590,15 @@ add-rec(elem, lsts):
 
 ##### Pseudocódigo
 
-Para determinar si la expresión proporcionada es sat o unsat empleamos la función `truth-tree` que llama a las funciones del apartado anterior para limpiar la expresión y crear el árbol, así como a otra función nueva llamada `sat` que determina si el árbol es sat o no; esta última emplea a su vez una función auxiliar llamada `contradiction` que recibe una rama del árbol y determina si hay o no contradicciones en ella.
+Para determinar si la expresión proporcionada es SAT o UNSAT empleamos la función `truth-tree`, que llama a las funciones del apartado anterior para limpiar la expresión y crear el árbol, así como a otra función nueva llamada `sat` que determina si el árbol es sat o no; esta última emplea a su vez una función auxiliar llamada `contradiction` que recibe una rama del árbol y determina si hay o no contradicciones en ella.
 
 El pseudocódigo de estas funciones es:
 
 ```
 truth-tree(fbf):
 	devolver sat(expand-truth-tree-aux(limpiar fbf) NIL)
-
-
+```
+```
 sat(fbf):
 	si fbf está vacía:
 		devolver NIL
@@ -603,7 +607,8 @@ sat(fbf):
 	si no:
 		devolver true
 
-
+```
+```
 contradiction(pos, neg, fbf):
 	si fbf está vacía:
 		devolver NIL
@@ -629,15 +634,15 @@ contradiction(pos, neg, fbf):
 
 ##### Preguntas
 
-###### 1)  si en lugar de (∧ A (∨ B C)) tuviésemos (∧ A (¬ A) (∨ B C)), ¿qué sucedería?
+> 1)  Si en lugar de (∧ A (∨ B C)) tuviésemos (∧ A (¬ A) (∨ B C)), ¿qué sucedería?
 
 Como A y (¬A) son incompatibles (^ A (¬A)) no es puede cumplirse, por lo que `truth-tree` devolverá `NIL`.
 
-###### 2)¿Y en el caso de (∧ A (∨ B C)(¬ A))?
+> 2) ¿Y en el caso de (∧ A (∨ B C)(¬ A))?
 
 De nuevo para que esa expresión se cumpla debe cumplirse (^ A (¬A)) que es imposible, por lo que de nuevo se devolverá `NIL`.
 
-###### 3) estudia la salida del trace mostrada más arriba. ¿Qué devuelve la función expand-truth-tree?
+> 3) estudia la salida del trace mostrada más arriba. ¿Qué devuelve la función expand-truth-tree?
 
 La función `expand-truth-tree` devuelve como va evolucionando cada una de las ramas del árbol de verdad según este se va expandiendo.
 
@@ -678,7 +683,7 @@ La función:
     (bfs end (list (list start)) net)
 ```
 
-Soluciona el problema de encontrar el camino más corto entre 2 nodos del grafo ya que realiza el algoritmo bfs en el grafo estableciendo como elemento inicial de Q el nodo desde el que se quiere iniciar, haciendo que el primer elemento que se extraiga de Q en el algoritmo sea este primero, de modo que el algoritmo comience en este nodo y termine en el nodo que se introduzca como end.
+Soluciona el problema de encontrar el camino más corto entre 2 nodos del grafo ya que realiza el algoritmo BFS en el grafo estableciendo como elemento inicial de Q el nodo desde el que se quiere iniciar, haciendo que el primer elemento que se extraiga de Q en el algoritmo sea este primero, de modo que el algoritmo comience en este nodo y termine en el nodo que se introduzca como end.
 
 #### Apartado 5.6
 
