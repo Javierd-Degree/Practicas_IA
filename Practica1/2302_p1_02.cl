@@ -77,7 +77,7 @@
 (defun cosine-distance-mapcar (x y)
   (cosine-distance x y #'dot-product-mapcar))
 
-(print "Apartado 1.1")
+;;;(print "Apartado 1.1")
 ;;; Recursiva
 ;;; (print (cosine-distance-rec '(1 0) '(0 1)))
 ;;; (print (cosine-distance-rec '(1 2 3) '(1 2 3)))
