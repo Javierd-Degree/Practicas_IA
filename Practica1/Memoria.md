@@ -697,7 +697,127 @@ La función `expand-truth-tree` devuelve como va evolucionando cada una de las r
 
 ##### Casos especiales
 
+###### Grafo vacío
+
+En un grafo vacío el algoritmo no tiene grafo que analizar y por tanto no existirá ningún camino sean cuales sean los nodos inicial y final propuestos.
+
+###### Grafo cuyo inicio es el final.
+
+En este caso el primer nodo que el algoritmo comprobaría sería el nodo inicial, detecta que es el final, y por tanto ha encontrado un camino que es el nodo.
+
+En este ejemplo se quiere ir del nodo 3 al nodo 3.
+
+![1551989700117](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551989700117.png)
+
+El camino encontrado es en sí, el nodo 3.
+
+###### Grafo cadena
+
+En n grafo cadena solo existe un camino posible entre 2 nodos, que es el que encontraría el algoritmo ya que iría analizando un nodo en cada dirección desde el origen, y cuando llegase al nodo destino habrá encontrado el camino. Si antes de llegar al destino se encuentra con que en una de las 2 direcciones no quedan nodos por explorar, esa será la dirección errónea y continuará con los únicos nodos que puede explorar que son los que le queden en la otra dirección, hasta encontrar el camino.
+
+![1551992012106](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551992012106.png)
+
+En este caso, por ejemplo, si se quisiese ir del nodo 2 al 4, el único camino posible sería 2, 3, 4, y, por tanto, este sería el camino que encontraría BFS.
+
+###### Grafo cíclico
+
+En un grafo cíclico existen siempre 2 caminos entre 2 nodos. En este caso el algoritmo encontrará el más corto de los 2 ya que al ir analizando en una cola fifo, irá comprobando cada vez un nodo de  cada uno de los caminos, y, cuando encuentre el nodo final parará.
+
+![1551992124647](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551992124647.png)
+
+En este caso, si se desease ir del nodo 3 al 5, habría 2 caminos posibles. Uno de ellos sería 3, 4, 5, y el otro sería 3, 2, 1, 5. De entre estos 2 FBS encontraría 3, 4, 5 por ser el más corto.
+
+###### Grafo no conexo que debe ir desde uno de los sub-grafos conexos al otro
+
+En este caso, BFS recorre el sub-grafo conexo al que pertenece el origen, y luego para pues todos los nodos que puede explorar ya han sido explorados antes. Por tanto no existe camino entre el origen y el destino.
+
+En este ejemplo tratamos de ir del nodo 1 al 4.
+
+1º Se expande el nodo 1 añadiendo los nodos 2 y 3 a la cola (sus vecinos).
+
+![1551991888565](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551991888565.png)
+
+2º Se expande ahora el nodo 2, el 3 no se añade a la cola pues ya ha sido descubierto.
+
+![1551991635448](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551991635448.png)
+
+3º Se expande el nodo 3, no se añaden nodos a la cola pues todos sus vecinos ya han sido descubiertos.
+
+![1551991868537](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551991868537.png)
+
+No quedan nodos que explorar en la cola, luego el algoritmo acaba sin encontrar ningún camino.
+
 ##### Casos Típicos
+
+###### 1) Grafo no dirigido
+
+Tomamos como primer caso "típico" un grafo no dirigido en el que se quiere ir del nodo 3 al nodo 7. En este caso el algoritmo se llevaría a cabo de la siguiente forma:
+
+1º Se expande el nodo 3 descubriendo sus vecinos y añadiéndolos a la cola (de menor a mayor).
+
+![1551989866874](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551989866874.png)
+
+2º Se explora el primer nodo de la cola (4) y se expande, de nuevo se añaden los vecinos a la cola.
+
+![1551989925691](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551989925691.png)
+
+3º Le toca el turno al 6 pero el 1 no se añade a la cola pues ya se había añadido antes.
+
+![1551989983900](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551989983900.png)
+
+4º El siguiente en la cola es el 1, al explorarlo tan solo se añade el 2 a la cola.
+
+![1551990038149](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990038149.png)
+
+5º Procedemos a explorar el 5, añadimos el 7 a la cola pues el 7 ya estaba en ella.
+
+![1551990080945](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990080945.png)
+
+6º Exploramos el próximo de la cola (2) pero ninguno de sus vecinos se añade a la cola pues ya han sido explorados.
+
+![1551990118050](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990118050.png)
+
+7º Toca ahora explorar el número 7, que es el destino, luego el algoritmo finaliza. 
+
+![1551990170696](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990170696.png)
+
+FBS acaba encontrado un camino, que es 3, 4, 5, 7.
+
+###### 2) Grafo dirigido
+
+Como segundo caso típico tomamos el mismo grafo pero, esta vez, con aristas dirigidas. De nuevo intentamos ir del nodo 3 al nodo 7.
+
+El desarrollo es muy similar pero al expandir los nodos se consideran vecinos solo los que tienen enlaces desde el nodo que se esta expandiendo hasta él, y no al revés.
+
+1º Se expande el nodo 3 y se añaden el 4 y el 6 a la cola.
+
+![1551990248481](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990248481.png)
+
+2º Se expande el nodo 4 y se añade el 1 a la cola.
+
+![1551990332529](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990332529.png)
+
+3º Se expande el nodo 6 pero no se añade ninguno a la cola pues no tiene vecinos conectados en el sentido adecuado.
+
+![1551990365391](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990365391.png)
+
+4º Se expande el nodo 1 y se añade el 2 a la cola.
+
+![1551990434644](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990434644.png)
+
+5º Se expande el nodo 2 añadiendo el 5 a la cola.
+
+![1551990462756](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990462756.png)
+
+6º Se expande el nodo 5, los nodos 1 y 4 ya han sido explorados por lo que no se añaden a la cola, pero el nodo 7 si.
+
+![1551990507844](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990507844.png)
+
+7º Se expande el nodo 7 que es el destino por lo que el algoritmo termina.
+
+![1551990541429](C:\Users\javix\AppData\Roaming\Typora\typora-user-images\1551990541429.png)
+
+En este caso también se ha encontrado un camino, que es 3, 4, 1, 2, 5, 7.
 
 #### Apartado 5.2
 
