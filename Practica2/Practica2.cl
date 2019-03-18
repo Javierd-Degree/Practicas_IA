@@ -568,7 +568,12 @@
 ;; node to be analyzed is the one with the smallest value of g+h
 ;;
 (defparameter *A-star*
-  (make-strategy ))
+  	(make-strategy 
+  		:name 'smallest-f
+  		:node-compare-p #'node-f-<=))
+
+(defun node-f-<= (node-1 node-2)
+	(<= (node-f node-1) (node-f node-2)))
 
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
