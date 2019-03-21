@@ -569,7 +569,9 @@
 ;;
 
 (defun node-f-<= (node-1 node-2)
-	(<= (node-f node-1) (node-f node-2)))
+	(if (or (null node-1) (null node-2))
+		t
+		(<= (node-f node-1) (node-f node-2))))
 
 (defparameter *A-star*
   	(make-strategy 
@@ -652,7 +654,13 @@
 ;;     the initial one. So, what we have here is a rather complex
 ;;     nested structure that contains not only the final node but the
 ;;     whole path from the starting node to the final.
-;;
+
+
+(defun node-in-lst(node lst problem)
+	(cond ((null lst) NIL)
+		((funcall (problem-f-search-state-equal problem) node (first lst)) (first lst))
+		(t (node-in-lst node (rest lst) problem))))
+
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
  	(cond ((null open-nodes) NIL)
  		((funcall (problem-f-goal-test problem) (first open-nodes))
@@ -681,19 +689,20 @@
 ;;    This function simply prepares the data for the auxiliary
 ;;    function: creates an open list with a single node (the source)
 ;;    and an empty closed list.
-;;
+;
+
+(defun root-node (problem)
+	(make-node
+		:state (problem-initial-state problem)
+		:parent NIL
+		:action NIL
+		:depth 0
+		:g 0
+		:h (funcall (problem-f-h problem) (problem-initial-state problem))
+		:f (funcall (problem-f-h problem) (problem-initial-state problem))))
+
 (defun graph-search (problem strategy)
-	
-	(graph-search-aux problem (list 
-		(make-node
-			:state (problem-initial-state problem)
-			:parent NIL
-			:action NIL
-			:depth 0
-			:g 0
-			:h (funcall (problem-f-h problem) (problem-initial-state problem) *estimate*)
-			:f (funcall (problem-f-h problem) (problem-initial-state problem) *estimate*)))
-		'() strategy))
+	(graph-search-aux problem (list (root-node problem)) '() strategy))
 
 ;
 ;  A* search is simply a function that solves a problem using the A* strategy
