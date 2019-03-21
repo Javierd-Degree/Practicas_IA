@@ -242,7 +242,7 @@
 ;;
 ;; Navigate path
 ;;
-;;  Returns the list of the node parents
+;;  Returns the list of the node parents' state
 ;;
 ;;  Input:
 ;;    node:       node structure that contains, in the chain of parent-nodes,
@@ -497,10 +497,10 @@
 ;;
 (defun insert-node (node lst-nodes node-compare-p)
 	(cond ((null lst-nodes)
-        (list node))
-      ((funcall node-compare-p node (first lst-nodes))
-        (cons node lst-nodes))
-      (t (cons (first lst-nodes) (insert-node node lst-nodes node-compare-p)))))
+        	(list node))
+      	((funcall node-compare-p node (first lst-nodes))
+        	(cons node lst-nodes))
+      	(t (cons (first lst-nodes) (insert-node node (rest lst-nodes) node-compare-p)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -567,13 +567,14 @@
 ;; us which nodes should be analyzed first. In the A* strategy, the first
 ;; node to be analyzed is the one with the smallest value of g+h
 ;;
+
+(defun node-f-<= (node-1 node-2)
+	(<= (node-f node-1) (node-f node-2)))
+
 (defparameter *A-star*
   	(make-strategy 
   		:name 'smallest-f
   		:node-compare-p #'node-f-<=))
-
-(defun node-f-<= (node-1 node-2)
-	(<= (node-f node-1) (node-f node-2)))
 
 ;;
 ;; END: Exercise 8 -- Definition of the A* strategy
@@ -609,6 +610,23 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Get complete path
+;;
+;;  Returns the list of the node parents
+;;
+;;  Input:
+;;    node:       node structure that contains, in the chain of parent-nodes,
+;;                a path starting at the initial state
+;;
+;;  Returns
+;;    List with the node parents' sequence
+;;
+(defun get-complete-path (node)
+  (if (null (node-parent node))
+    (list node)
+    (cons node (navigate-path (node-parent node)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -636,7 +654,13 @@
 ;;     whole path from the starting node to the final.
 ;;
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
-  )
+ 	(if (null open-nodes)
+ 		NIL
+ 		(cond ((funcall (problem-f-goal-test problem) (first open-nodes))
+ 		 		(get-complete-path (first open-nodes)))
+ 			(())
+
+ 		)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -660,13 +684,13 @@
 ;;    and an empty closed list.
 ;;
 (defun graph-search (problem strategy)
-  )
+ 	(graph-search-aux problem (list (problem-initial-state problem)) '() strategy))
 
 ;
 ;  A* search is simply a function that solves a problem using the A* strategy
 ;
 (defun a-star-search (problem)
-  )
+ 	(graph-search problem *A-star*))
 
 
 ;;
