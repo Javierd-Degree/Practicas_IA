@@ -654,13 +654,12 @@
 ;;     whole path from the starting node to the final.
 ;;
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
- 	(if (null open-nodes)
- 		NIL
- 		(cond ((funcall (problem-f-goal-test problem) (first open-nodes))
- 		 		(get-complete-path (first open-nodes)))
- 			(())
-
- 		)))
+ 	(cond ((null open-nodes) NIL)
+ 		((funcall (problem-f-goal-test problem) (first open-nodes))
+		 	(get-complete-path (first open-nodes)))
+		((funcall (strategy-node-compare-p strategy) (first open-nodes) (node-in-lst (first open-nodes) closed-nodes problem)) 
+			(graph-search-aux problem (insert-nodes-strategy (expand-node (first open-nodes) problem) (rest open-nodes) strategy) (cons (first open-nodes) closed-nodes) strategy))
+		(t (graph-search-aux problem (rest open-nodes) closed-nodes strategy))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -684,7 +683,17 @@
 ;;    and an empty closed list.
 ;;
 (defun graph-search (problem strategy)
- 	(graph-search-aux problem (list (problem-initial-state problem)) '() strategy))
+	
+	(graph-search-aux problem (list 
+		(make-node
+			:state (problem-initial-state problem)
+			:parent NIL
+			:action NIL
+			:depth 0
+			:g 0
+			:h (funcall (problem-f-h problem) (problem-initial-state problem) *estimate*)
+			:f (funcall (problem-f-h problem) (problem-initial-state problem) *estimate*)))
+		'() strategy))
 
 ;
 ;  A* search is simply a function that solves a problem using the A* strategy
