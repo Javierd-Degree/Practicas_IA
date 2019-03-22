@@ -251,10 +251,11 @@
 ;;  Returns
 ;;    List with the node parents' sequence
 ;;
-(defun navigate-path (node)
+(defun navigate-path (node path)
   (if (null (node-parent node))
-    (list (node-state node))
-    (cons (node-state node) (navigate-path (node-parent node)))))
+    	(cons (node-state node) path)
+    (navigate-path (node-parent node) (cons (node-state node) path))))
+    
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -299,7 +300,7 @@
 (defun f-goal-test (node destination mandatory)
   (if (not (find (node-state node) destination))
     NIL
-    (check-mandatory (navigate-path node) mandatory)))
+    (check-mandatory (navigate-path node NIL) mandatory)))
 
 ;;
 ;; END: Exercise 3 -- Goal test
@@ -351,7 +352,7 @@
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
   (if (not (eql (node-state node-1) (node-state node-2)))
     NIL
-    (f-equivalent-paths (navigate-path node-1) (navigate-path node-2) mandatory)))
+    (f-equivalent-paths (navigate-path node-1 NIL) (navigate-path node-2 NIL) mandatory)))
 
 ;;
 ;; END: Exercise 4 -- Equal predicate for search states
@@ -569,7 +570,7 @@
 ;;
 
 (defun node-f-<= (node-1 node-2)
-	(if (or (null node-1) (null node-2))
+	(if (null node-2)
 		t
 		(<= (node-f node-1) (node-f node-2))))
 
@@ -625,10 +626,10 @@
 ;;  Returns
 ;;    List with the node parents' sequence
 ;;
-(defun get-complete-path (node)
-  (if (null (node-parent node))
-    (list node)
-    (cons node (navigate-path (node-parent node)))))
+;;(defun get-complete-path (node)
+;;  (if (null (node-parent node))
+;;    (list node)
+;;    (cons node (navigate-path (node-parent node)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -663,21 +664,21 @@
 
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
  	(if (null open-nodes)
-    NIL ; No se encuentra la solución
-    (let ((current-node (first open-nodes)) (rest-nodes (rest open-nodes)))
-      (if (funcall (problem-f-goal-test problem) current-node)
-  		 	   current-node ; Devuelve la solución
-  		   (if (funcall (strategy-node-compare-p strategy)
-                current-node
-                (node-in-lst current-node closed-nodes problem))
-      		    (graph-search-aux problem
-                (insert-nodes-strategy
-                  (expand-node current-node problem)
-                  rest-nodes
-                  strategy)
-                (cons current-node closed-nodes)
-                strategy))
-            (graph-search-aux problem rest-nodes closed-nodes strategy)))))
+    		NIL ; No se encuentra la solución
+	    (let ((current-node (first open-nodes)) (rest-nodes (rest open-nodes)))
+	      	(if (funcall (problem-f-goal-test problem) current-node)
+	  		 	    current-node ; Devuelve la solución
+	  			(if (funcall (strategy-node-compare-p strategy)
+			                current-node
+			                (node-in-lst current-node closed-nodes problem))
+		      		    (graph-search-aux problem
+			                (insert-nodes-strategy
+			                	(expand-node current-node problem)
+			                	rest-nodes
+			                 	strategy)
+			                (cons current-node closed-nodes)
+			                strategy)
+	            	(graph-search-aux problem rest-nodes closed-nodes strategy))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -734,15 +735,59 @@
 ;*** solution-path ***
 
 (defun solution-path (node)
-  )
+	(if (null node)
+			NIL
+		(navigate-path node NIL)))
 
 ;*** action-sequence ***
 ; Visualize sequence of actions
 
+(defun action-sequence-aux (node actions)
+	(if (null (node-parent node))
+	    	actions
+	    (action-sequence-aux (node-parent node) (cons (node-action node) actions))))
+
 (defun action-sequence (node)
-  )
+	(if (null node)
+			NIL
+  		(action-sequence-aux node NIL)))
 
 ;;;
 ;;;    END Exercise 10: Solution path / action sequence
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;    BEGIN Exercise 11
+;;;
+
+
+(defun depth-first-node-compare-p (node-1 node-2)
+	(if (null node-2)
+			t
+		(>= (node-depth node-1) (node-depth node-2))))
+
+(defparameter *depth-first*
+	(make-strategy
+		:name 'depth-first
+		:node-compare-p #'depth-first-node-compare-p))
+
+
+
+(defun breadth-first-node-compare-p (node-1 node-2)
+	(if (null node-2)
+			t
+		(<= (node-depth node-1) (node-depth node-2))))
+
+(defparameter *breadth-first*
+	(make-strategy
+		:name 'breadth-first
+		:node-compare-p #'breadth-first-node-compare-p))
+
+
+
+;;;
+;;;    END Exercise 11
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
