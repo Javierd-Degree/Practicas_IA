@@ -574,7 +574,7 @@
 		(<= (node-f node-1) (node-f node-2))))
 
 (defparameter *A-star*
-  	(make-strategy 
+  	(make-strategy
   		:name 'smallest-f
   		:node-compare-p #'node-f-<=))
 
@@ -655,19 +655,29 @@
 ;;     nested structure that contains not only the final node but the
 ;;     whole path from the starting node to the final.
 
-
+;;; Si esta repetido coge el de menor peso porque la lista esta ordenada
 (defun node-in-lst(node lst problem)
 	(cond ((null lst) NIL)
 		((funcall (problem-f-search-state-equal problem) node (first lst)) (first lst))
 		(t (node-in-lst node (rest lst) problem))))
 
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
- 	(cond ((null open-nodes) NIL)
- 		((funcall (problem-f-goal-test problem) (first open-nodes))
-		 	(get-complete-path (first open-nodes)))
-		((funcall (strategy-node-compare-p strategy) (first open-nodes) (node-in-lst (first open-nodes) closed-nodes problem)) 
-			(graph-search-aux problem (insert-nodes-strategy (expand-node (first open-nodes) problem) (rest open-nodes) strategy) (cons (first open-nodes) closed-nodes) strategy))
-		(t (graph-search-aux problem (rest open-nodes) closed-nodes strategy))))
+ 	(if (null open-nodes)
+    NIL ; No se encuentra la solución
+    (let ((current-node (first open-nodes)) (rest-nodes (rest open-nodes)))
+      (if (funcall (problem-f-goal-test problem) current-node)
+  		 	   current-node ; Devuelve la solución
+  		   (if (funcall (strategy-node-compare-p strategy)
+                current-node
+                (node-in-lst current-node closed-nodes problem))
+      		    (graph-search-aux problem
+                (insert-nodes-strategy
+                  (expand-node current-node problem)
+                  rest-nodes
+                  strategy)
+                (cons current-node closed-nodes)
+                strategy))
+            (graph-search-aux problem rest-nodes closed-nodes strategy)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
