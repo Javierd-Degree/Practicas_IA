@@ -190,14 +190,15 @@
 ;;    A list of action structures with the origin in the current state and
 ;;    the destination in the states to which the current one is connected
 ;;
-(defun navigate (state lst-edges cfun  name &optional forbidden )
+(defun navigate (state lst-edges cfun name &optional forbidden)
   (cond ((null lst-edges) NIL)
     ((and (eql (first (first lst-edges)) state) (not (find (second (first lst-edges)) forbidden)))
-      (cons (make-action
-        :name name
-        :origin state
-        :final (second (first lst-edges))
-        :cost (funcall cfun (third (first lst-edges))))
+      (cons 
+      	(make-action
+	        :name name
+	        :origin state
+	        :final (second (first lst-edges))
+	        :cost (funcall cfun (third (first lst-edges))))
         (navigate state (rest lst-edges) cfun name forbidden )))
     (t (navigate state (rest lst-edges) cfun name forbidden ))))
 
@@ -237,6 +238,24 @@
 ;; BEGIN: Exercise 3 -- Goal test
 ;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Navigate path aux
+;;
+;;  Returns the list of the node parents' state
+;;
+;;  Input:
+;;    node:       node structure that contains, in the chain of parent-nodes,
+;;                a path starting at the initial state
+;;	  path:		  list with the expanded nodes in the path
+;;
+;;  Returns
+;;    List with the node parents' sequence
+;;
+(defun navigate-path-aux (node path)
+ 	(if (null (node-parent node))
+   		(cons (node-state node) path)
+		(navigate-path-aux (node-parent node) (cons (node-state node) path))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -251,12 +270,11 @@
 ;;  Returns
 ;;    List with the node parents' sequence
 ;;
-(defun navigate-path (node path)
-  (if (null (node-parent node))
-    	(cons (node-state node) path)
-    (navigate-path (node-parent node) (cons (node-state node) path))))
-    
-
+(defun navigate-path (node)
+	(if (null node)
+		NIL
+		(navigate-path-aux node '())))
+	
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -298,9 +316,11 @@
 ;;
 
 (defun f-goal-test (node destination mandatory)
-  (if (not (find (node-state node) destination))
-    NIL
-    (check-mandatory (navigate-path node NIL) mandatory)))
+  (if (null node)
+  	NIL	
+    (if (not (find (node-state node) destination))
+      NIL
+      (check-mandatory (navigate-path node) mandatory))))
 
 ;;
 ;; END: Exercise 3 -- Goal test
@@ -352,7 +372,7 @@
 (defun f-search-state-equal (node-1 node-2 &optional mandatory)
   (if (not (eql (node-state node-1) (node-state node-2)))
     NIL
-    (f-equivalent-paths (navigate-path node-1 NIL) (navigate-path node-2 NIL) mandatory)))
+    (f-equivalent-paths (navigate-path node-1) (navigate-path node-2) mandatory)))
 
 ;;
 ;; END: Exercise 4 -- Equal predicate for search states
@@ -423,15 +443,29 @@
 ;; using that action.
 ;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;  Creates a new node from its parent given an action
+;;
+;;  Input:
+;;    action:  the action structure to be applied
+;;	  node:	   the node structure in which we apply the action
+;;    problem: the problem structure with the list of operators
+;;
+;;  Returns:
+;;    A new node that can be reached from the given one
+;;
 (defun expand-node-action (action parent problem)
-    (make-node
-      :state (action-final action)
-      :parent parent
-      :action action
-      :depth (+ 1 (node-depth parent))
-      :g (+ (node-g parent) (action-cost action))
-      :h (funcall (problem-f-h problem) (action-final action))
-      :f (+ (node-g parent) (action-cost action) (funcall (problem-f-h problem) (action-final action)))))
+	(let ((g-value (+ (node-g parent) (action-cost action))) 
+			(h-value (funcall (problem-f-h problem) (action-final action))))
+	    (make-node
+	      :state (action-final action)
+	      :parent parent
+	      :action action
+	      :depth (+ 1 (node-depth parent))
+	      :g g-value
+	      :h h-value
+	      :f (+ g-value h-value))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -613,24 +647,6 @@
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; Get complete path
-;;
-;;  Returns the list of the node parents
-;;
-;;  Input:
-;;    node:       node structure that contains, in the chain of parent-nodes,
-;;                a path starting at the initial state
-;;
-;;  Returns
-;;    List with the node parents' sequence
-;;
-;;(defun get-complete-path (node)
-;;  (if (null (node-parent node))
-;;    (list node)
-;;    (cons node (navigate-path (node-parent node)))))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;  Auxiliary search function (the one that actually does all the work
@@ -735,9 +751,7 @@
 ;*** solution-path ***
 
 (defun solution-path (node)
-	(if (null node)
-			NIL
-		(navigate-path node NIL)))
+	(navigate-path node))
 
 ;*** action-sequence ***
 ; Visualize sequence of actions
