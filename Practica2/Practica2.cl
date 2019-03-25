@@ -604,9 +604,7 @@
 ;;
 
 (defun node-f-<= (node-1 node-2)
-	(if (null node-2)
-		t
-		(<= (node-f node-1) (node-f node-2))))
+	(<= (node-f node-1) (node-f node-2)))
 
 (defparameter *A-star*
   	(make-strategy
@@ -681,12 +679,10 @@
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
  	(if (null open-nodes)
     		NIL ; No se encuentra la solución
-	    (let ((current-node (first open-nodes)) (rest-nodes (rest open-nodes)))
+	    (let* ((current-node (first open-nodes)) (rest-nodes (rest open-nodes)) (repeated-node  (node-in-lst current-node closed-nodes problem)))
 	      	(if (funcall (problem-f-goal-test problem) current-node)
 	  		 	    current-node ; Devuelve la solución
-	  			(if (funcall (strategy-node-compare-p strategy)
-			                current-node
-			                (node-in-lst current-node closed-nodes problem))
+	  			(if (or (null repeated-node) (<= (node-g current-node) (node-g repeated-node)))
 		      		    (graph-search-aux problem
 			                (insert-nodes-strategy
 			                	(expand-node current-node problem)
@@ -778,9 +774,7 @@
 
 
 (defun depth-first-node-compare-p (node-1 node-2)
-	(if (null node-2)
-			t
-		(>= (node-depth node-1) (node-depth node-2))))
+	(>= (node-depth node-1) (node-depth node-2)))
 
 (defparameter *depth-first*
 	(make-strategy
@@ -790,9 +784,7 @@
 
 
 (defun breadth-first-node-compare-p (node-1 node-2)
-	(if (null node-2)
-			t
-		(<= (node-depth node-1) (node-depth node-2))))
+	(<= (node-depth node-1) (node-depth node-2)))
 
 (defparameter *breadth-first*
 	(make-strategy
@@ -803,5 +795,90 @@
 
 ;;;
 ;;;    END Exercise 11
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;    BEGIN Exercise 12
+;;;
+
+;;; La heurística escogida es el coste del enlace más barato para salir de la ciudad
+
+(defparameter *estimate-new*
+  '((Calais (0.0 0.0)) (Reims (25.0 15.0)) (Paris (30.0 10.0))
+    (Nancy (50.0 20.0)) (Orleans (55.0 38.0)) (St-Malo (65.0 15.0))
+    (Nantes (75.0 15.0)) (Brest (90.0 40.0)) (Nevers (70.0 20.0))
+    (Limoges (100.0 35.0)) (Roenne (85.0 5.0)) (Lyon (105.0 5.0))
+    (Toulouse (130.0 35.0)) (Avignon (135.0 10.0)) (Marseille (145.0 25.0))))
+
+(defparameter *travel-cost-new*
+ (make-problem
+   :states *cities*
+   :initial-state *origin*
+   :f-h #'(lambda (state) (f-h-price state *estimate-new*))
+   :f-goal-test #'(lambda (node) (f-goal-test node *destination* *mandatory*))
+   :f-search-state-equal #'(lambda (node-1 node-2) (f-search-state-equal node-1 node-2 *mandatory*))
+   :operators (list
+                  #'(lambda (node) (navigate-canal-price (node-state node) *canals*))
+                  #'(lambda (node) (navigate-train-price (node-state node) *trains* *forbidden*)))))
+
+
+
+
+;;;1ª VEZ 
+
+;;;(time (solution-path (a-star-search *travel-cheap*)))
+;;; ->
+;;; cpu time (non-gc) 0.000000 sec user, 0.000000 sec system
+;;; cpu time (gc)     0.031250 sec user, 0.000000 sec system
+;;; cpu time (total)  0.031250 sec user, 0.000000 sec system
+;;; real time  0.021000 sec (148.8%)
+;;; space allocation:
+;;;  43,116 cons cells, 888,808 other bytes, 0 static bytes
+;;; Page Faults: major: 0 (gc: 0), minor: 0 (gc: 0)
+;;;(MARSEILLE TOULOUSE LIMOGES NEVERS PARIS REIMS CALAIS)
+
+;;;(time (solution-path (a-star-search *travel-cost-new*)))
+;;; ->
+;;; cpu time (non-gc) 0.000000 sec user, 0.000000 sec system
+;;; cpu time (gc)     0.015625 sec user, 0.000000 sec system
+;;; cpu time (total)  0.015625 sec user, 0.000000 sec system
+;;; real time  0.011000 sec (142.0%)
+;;; space allocation:
+;;;  43,116 cons cells, 888,808 other bytes, 0 static bytes
+;;; Page Faults: major: 0 (gc: 0), minor: 0 (gc: 0)
+;;;(MARSEILLE TOULOUSE LIMOGES NEVERS PARIS REIMS CALAIS)
+
+
+;;;2ª VEZ 
+
+;;;(time (solution-path (a-star-search *travel-cheap*)))
+;;; ->
+;;; cpu time (non-gc) 0.015625 sec user, 0.000000 sec system
+;;; cpu time (gc)     0.000000 sec user, 0.000000 sec system
+;;; cpu time (total)  0.015625 sec user, 0.000000 sec system
+;;; real time  0.011000 sec (142.0%)
+;;; space allocation:
+;;;  43,116 cons cells, 888,808 other bytes, 0 static bytes
+;;; Page Faults: major: 0 (gc: 0), minor: 0 (gc: 0)
+;;;(MARSEILLE TOULOUSE LIMOGES NEVERS PARIS REIMS CALAIS)
+
+;;;(time (solution-path (a-star-search *travel-cost-new*)))
+;;; ->
+;;; cpu time (non-gc) 0.015625 sec user, 0.000000 sec system
+;;; cpu time (gc)     0.000000 sec user, 0.000000 sec system
+;;; cpu time (total)  0.015625 sec user, 0.000000 sec system
+;;; real time  0.008000 sec (195.3%)
+;;; space allocation:
+;;;  43,116 cons cells, 888,680 other bytes, 0 static bytes
+;;; Page Faults: major: 0 (gc: 0), minor: 0 (gc: 0)
+;;;(MARSEILLE TOULOUSE LIMOGES NEVERS PARIS REIMS CALAIS)
+ 
+
+
+;;;
+;;;    END Exercise 12
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
