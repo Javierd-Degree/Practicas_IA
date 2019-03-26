@@ -774,7 +774,7 @@
 
 
 (defun depth-first-node-compare-p (node-1 node-2)
-	(>= (node-depth node-1) (node-depth node-2)))
+	t)
 
 (defparameter *depth-first*
 	(make-strategy
@@ -784,7 +784,7 @@
 
 
 (defun breadth-first-node-compare-p (node-1 node-2)
-	(<= (node-depth node-1) (node-depth node-2)))
+	NIl)
 
 (defparameter *breadth-first*
 	(make-strategy
