@@ -679,18 +679,19 @@
 (defun graph-search-aux (problem open-nodes closed-nodes strategy)
  	(if (null open-nodes)
     		NIL ; No se encuentra la solución
-	    (let* ((current-node (first open-nodes)) (rest-nodes (rest open-nodes)) (repeated-node  (node-in-lst current-node closed-nodes problem)))
+	    (let ((current-node (first open-nodes))) 
 	      	(if (funcall (problem-f-goal-test problem) current-node)
 	  		 	    current-node ; Devuelve la solución
-	  			(if (or (null repeated-node) (<= (node-g current-node) (node-g repeated-node)))
-		      		    (graph-search-aux problem
-			                (insert-nodes-strategy
-			                	(expand-node current-node problem)
-			                	rest-nodes
-			                 	strategy)
-			                (cons current-node closed-nodes)
-			                strategy)
-	            	(graph-search-aux problem rest-nodes closed-nodes strategy))))))
+	  		 	(let ((rest-nodes (rest open-nodes)) (repeated-node  (node-in-lst current-node closed-nodes problem)))
+		  			(if (or (null repeated-node) (<= (node-g current-node) (node-g repeated-node)))
+			      		    (graph-search-aux problem
+				                (insert-nodes-strategy
+				                	(expand-node current-node problem)
+				                	rest-nodes
+				                 	strategy)
+				                (cons current-node closed-nodes)
+				                strategy)
+		            	(graph-search-aux problem rest-nodes closed-nodes strategy)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -774,7 +775,7 @@
 
 
 (defun depth-first-node-compare-p (node-1 node-2)
-	(>= (node-depth node-1) (node-depth node-2)))
+	t)
 
 (defparameter *depth-first*
 	(make-strategy
@@ -784,7 +785,7 @@
 
 
 (defun breadth-first-node-compare-p (node-1 node-2)
-	(<= (node-depth node-1) (node-depth node-2)))
+	NIL)
 
 (defparameter *breadth-first*
 	(make-strategy
