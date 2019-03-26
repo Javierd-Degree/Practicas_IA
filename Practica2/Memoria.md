@@ -21,7 +21,7 @@ Y, efectivamente, vemos que funciona de la manera esperada.
 
 A pesar de tener que elaborar dos funciones distintas, el pseudo-código es prácticamente el mismo para ambas, pues se basa en recorrer recursivamente la lista *sensors*, por tanto, mostramos únicamente el pseudo-código de una de ellas:
 
-```
+```pseudocode
 f-h-time (state, sensors):
 	si vacio(sensors):
 		devolver false
@@ -65,7 +65,7 @@ De esta forma, las otras cuatro funciones son llamadas a esta primera variando l
 
 Mostramos entonces únicamente el pseudo-código de la función *navigate*, pues las otras cuatro son extremadamente simples y se han mencionado en el apartado anterior.
 
-```
+```pseudocode
 navigate (state, lst-edges, cfun, name, forbidden):
 	si vacia(lst-edges):
 		devolver NIL
@@ -80,7 +80,7 @@ navigate (state, lst-edges, cfun, name, forbidden):
 
 La función *crear_accion(primer_elemento(sensors))* correspondería simplemente a inicializar una accion como:
 
-```
+```pseudocode
 crear_accion(elem, state, name, cfun):
     accion.name = name
     accion.state = state
@@ -123,7 +123,7 @@ Por último, la función *f-goal-test* se encarga únicamente de comprobar que e
 
 El pseudo-código para estas funciones sería entonces:
 
-```
+```pseudocode
 navigate-path-aux(node, path):
 	si node no tiene padre:
 		devolver concatenar(node-nombre, path)
@@ -169,7 +169,7 @@ Para la resolución del apartado únicamente cabe destacar que hemos desarrollad
 
 El pseudo-código para estas funciones sería entonces:
 
-```commonlisp
+```pseudocode
 f-equivalent-paths(path-1, path-2, mandatory):
 	si vacio(mandatory):
 		devolver True
@@ -293,7 +293,7 @@ Hemos definido una función auxiliar, *expand-node-action*, que permite obtener 
 De esta forma, la función *expand-node* se encarga de iterar esta función auxiliar sobre las acciones generadas a partir del nodo dado y de los problem-operators de problema pasado como argumento.
  ##### Pseudo-código
  El pseudo-código de estas funciones sería entonces:
- ```
+ ```pseudocode
  expand-node-action (action, parent, problem):
  	crear_nodo(state=action.final,
  		parent=parent,
@@ -323,14 +323,14 @@ Y, con estas dos funciones anteriores, la función pedida consiste en llamar a *
 
 ##### Pseudo-código
 El pseudo-código de las funciones desarrolladas en este apartado sería entonces:
-```
+```pseudocode
 insert-node (node, lst-nodes, node-compare-p):
 	si vacio(lst-nodes):
 		devolver lista(node)
 	si node-compare-p(node, primer_elemento(lst-nodes)):
 		devolver concatenar(node, lst-nodes)
 	si no:
-		devolver concatenar(primer_elemento(lst-nodes), insert-node(node, resto(lst-				nodes), node-compare-p))
+		devolver concatenar(primer_elemento(lst-nodes), insert-node(node, resto(lst-nodes), node-compare-p))
 		
 insert-nodes(nodes, lst-nodes, node-compare-p):
 	si vacio(nodes):
@@ -350,9 +350,56 @@ En este apartado, al igual que en el ejercicio 5, simplemente hemos tenido que d
 
 ### Ejercicio 9
 
+##### Batería de ejemplso
+
+##### Comentarios sobre la implementación
+
+##### Pseudocódigo
+
 
 
 ### Ejercicio 10
+
+##### Batería de ejemplos
+
+Del mismo modo que en varios apartados anteriores consideramos que, sabiendo que las funciones de los apartados anteriores funcionan de manera correcta, para comprobar el correcto funcionamiento de las funciones de este apartado bastaría con comprobar que si no se les pasa ningún nodo devuelven `nil`, y si se les pasa uno devuelven el camino o la secuencia de acciones de forma correcta. Por tanto consideramos que tan solo es necesario añadir en esta batería de ejemplos el caso en el que a `action-sequence` se le pasa un nodo que es `nil`, puesto que los casos de prueba que se nos proporcionan son suficientes para comprobar el correcto funcionamiento de la implementación en todos los demás casos.
+
+Este ejemplo sería el siguiente:
+
+```commonlisp
+(action-sequence NIL) ; --> NIL
+```
+
+Realizando esta simple comprobación, así como los casos de prueba proporcionados, comprobamos que nuestra implementación funciona de manera correcta.
+
+##### Comentarios sobre la implementación
+
+Para implementar la función `solution-path` tenemos una función llamada `navigate-path` que implementados en un apartado anterior que realiza el funcionamiento pedido. Por tanto, `solution-path` simplemente devuelve el resultado de llamar a la función `navigate-path` con el nodo pasado por argumento.
+
+En el caso de `action-sequence` no disponemos de una función que tenga la misma funcionalidad, por lo tanto esta sí debe diseñarse de cero. Para ello en primer lugar comprobamos si el nodo es `nil`, y si lo es devolvemos `nil`. En caso contrario llamamos a una función auxiliar que hemos llamado `action-sequence-aux` que emplea recursión para ir recorriendo las acciones que han generado los distintos nodos del camino seguido hasta el nodo que se pasa como argumento. Para ello establecemos que esta función auxiliar se llame recursivamente con el padre del nodo actual añadiendo a una lista de acciones (que comienza vacía) la acción que lo ha generado (que se obtiene del campo `action` de la estructura `node`), y establecemos un caso base (cuando el nodo no tiene padre) en el que se devuelve la lista de acciones que se tiene.
+
+##### Pseudo-código
+
+El pseudocódigo de las funciones pedidas será por tanto el siguiente:
+
+```pseudocode
+solution-path (node):
+	return navigate-path node
+
+
+action-sequence-aux (node, actions):
+	si el nodo tiene padre:
+		return action-sequence-aux(padre(nodo), cons(accion(nodo), actions))
+	si no:    	
+	    return actions
+	    
+
+action-sequence (node):
+	si el nodo es nil:
+		return NIL
+	si no:
+  		return action-sequence-aux (node, NIL)
+```
 
 
 
@@ -360,7 +407,21 @@ En este apartado, al igual que en el ejercicio 5, simplemente hemos tenido que d
 
 ##### Batería de ejemplos
 
+Sabiendo que las funciones implementadas en apartados anteriores funcionan de forma correcta, para probar el correcto funcionamiento de este apartado basta con probar que las nuevas estrategias definidas (y sus respectivas funciones de comparación) hacen que las funciones de búsqueda encuentren el camino correcto con dicha estrategia. Para probar esto es suficiente con probar para las 2 nuevas estrategias que en la resolución de los problemas `*travel-fast*` y `*tavel-cheap*` se encuentra el camino correcto. 
 
+Por lo tanto la batería de ejemplos propuesta para este apartado será:
+
+```commonlisp
+(solution-path (graph-search *travel-cheap* *depth-first*)) ; -> (MARSEILLE TOULOUSE NANTES ST-MALO PARIS REIMS CALAIS)
+
+(solution-path (graph-search *travel-fast* *depth-first*)) ; -> (MARSEILLE TOULOUSE NANTES ST-MALO PARIS REIMS CALAIS)
+
+(solution-path (graph-search *travel-cheap* *breadth-first*)) ; -> (MARSEILLE TOULOUSE NANTES ST-MALO PARIS REIMS CALAIS)
+
+(solution-path (graph-search *travel-fast* *breadth-first*)) ; -> (MARSEILLE TOULOUSE NANTES ST-MALO PARIS REIMS CALAIS)
+```
+
+Al probar estos 4 ejemplos vemos que las nuevas estrategias están implementadas de forma correcta.
 
 ##### Comentarios sobre la implementación
 
@@ -374,7 +435,7 @@ Para la búsqueda en anchura, la lista de abiertos se tiene que comportar como u
 
 Como hemos mencionado en el apartado anterior, el pseudo-código de las dos funciones sería:
 
-```
+```pseudocode
 depth-first-node-compare-p (node-1, node-2):
 	devolver True
 
@@ -388,7 +449,27 @@ breadth-first-node-compare-p (node-1, node-2):
 
 La heurística escogida es el coste del enlace más barato para salir de la ciudad.
 
-<span style="color:red">EXPLICAR POR QUÉ ES ADMISIBLE ETC, Y TIEMPOS</span>
+Sabemos que si una heurística es monótona, entonces es también admisible. Por tanto para comprobar si nuestra heurística es válida para solucionar el problema podemos comprobar si es monótona, y, si lo es, entonces será admisible para nuestro problema.
+
+Para probar que la heurística escogida es monótona sabemos que para serlo debe cumplir:
+$$
+h(x) ≤ g(x => x') + h(x')
+$$
+Donde `x'` es el nodo al que se quiere ir desde el nodo `x` y `g(x => x')` es el coste de ir de `x` a `x'`.
+
+Viendo los grafos que se nos proporcionan y analizando la heurística proporcionada vemos que la heurística de un nodo (el coste del enlace más barato para salir de él) será siempre mayor o igual al coste de ir desde ese nodo a cualquiera de los adyacentes, pues el coste para ir a alguno de los adyacentes será el coste de alguna de los enlaces que salen del nodo, y como heurística hemos cogido el menor de estos costes. Por lo tanto sabemos que:
+$$
+h(x) ≤ g(x => x')
+$$
+Además de esto, al observar los grafos vemos que no existe ningún enlace cuyo coste sea negativo por lo que ningún nodo puede tener una heurística negativa, de esto deducimos que:
+$$
+h(x) ≤ g(x => x') ≤ g(x => x') + h(x')
+$$
+Por lo tanto la heurística elegida cumple los requisitos para ser monótona, luego esta es también admisible.
+
+
+
+Aplicando esta heurística, el parámetro `*estimate-new*` queda de la siguiente manera:
 
 ```commonlisp
 (defparameter *estimate-new*
@@ -398,6 +479,53 @@ La heurística escogida es el coste del enlace más barato para salir de la ciud
     (Limoges (100.0 35.0)) (Roenne (85.0 5.0)) (Lyon (105.0 5.0))
     (Toulouse (130.0 35.0)) (Avignon (135.0 10.0)) (Marseille (145.0 25.0))))
 ```
+
+
+
+Para generar la nueva estructura `*travel-cost-new*` basta con tomar la estructura `*travel-cheap*` de los apartados anteriores y cambiar su parámetro `f-h` (función que determina la heurística de un nodo) para que emplee la nueva estructura `*estuimate-new*` en lugar de la antigua `*estimate*`. De este modo la nueva estructura será:
+
+```commonlisp
+(defparameter *travel-cost-new*
+ (make-problem
+   :states *cities*
+   :initial-state *origin*
+   :f-h #'(lambda (state) (f-h-price state *estimate-new*))
+   :f-goal-test #'(lambda (node) (f-goal-test node *destination* *mandatory*))
+   :f-search-state-equal #'(lambda (node-1 node-2) (f-search-state-equal node-1 node-2 *mandatory*))
+   :operators (list
+                  #'(lambda (node) (navigate-canal-price (node-state node) *canals*))
+                  #'(lambda (node) (navigate-train-price (node-state node) *trains* *forbidden*)))))
+```
+
+
+
+Por último, para comprobar que el algoritmo implementado es más eficiente con esta nueva heurística que con la heurística previa (siempre 0), ejecutamos el algoritmo con ambas heurísticas empleando la función `time` de `lisp`, que nos muestra el tiempo de ejecución. Al hacerlo obtenemos el siguiente resultado:
+
+```commonlisp
+(time (solution-path (a-star-search *travel-cheap*)))
+;;; ->
+;;; cpu time (non-gc) 0.015625 sec user, 0.000000 sec system
+;;; cpu time (gc)     0.000000 sec user, 0.000000 sec system
+;;; cpu time (total)  0.015625 sec user, 0.000000 sec system
+;;; real time  0.011000 sec (142.0%)
+;;; space allocation:
+;;;  43,116 cons cells, 888,808 other bytes, 0 static bytes
+;;; Page Faults: major: 0 (gc: 0), minor: 0 (gc: 0)
+;;;(MARSEILLE TOULOUSE LIMOGES NEVERS PARIS REIMS CALAIS)
+
+(time (solution-path (a-star-search *travel-cost-new*)))
+;;; ->
+;;; cpu time (non-gc) 0.015625 sec user, 0.000000 sec system
+;;; cpu time (gc)     0.000000 sec user, 0.000000 sec system
+;;; cpu time (total)  0.015625 sec user, 0.000000 sec system
+;;; real time  0.008000 sec (195.3%)
+;;; space allocation:
+;;;  43,116 cons cells, 888,680 other bytes, 0 static bytes
+;;; Page Faults: major: 0 (gc: 0), minor: 0 (gc: 0)
+;;;(MARSEILLE TOULOUSE LIMOGES NEVERS PARIS REIMS CALAIS)
+```
+
+Como se observa en los resultados obtenidos, el tiempo de ejecución con esta nueva heurística se reduce considerablemente, pasando de 0,011 segundos a 0,008 segundos, lo que nos demuestra que este algoritmo es notablemente más eficiente con la nueva heurística propuesta.
 
 
 
@@ -423,16 +551,14 @@ El uso de funciones lambda para estos tests permite que estas sean intercambiada
 
 **4. ¿Cuál es la complejidad espacial del algoritmo implementado?**
 
-Por ser $A^*$ el algoritmo, sabemos que la fórmula para calcular la complejidad espacial es
+Por ser $A^*​$ el algoritmo, sabemos que la fórmula para calcular la complejidad espacial es
 
 $O(b^{\lceil C^\ast/\varepsilon\rceil})​$, donde:
 
 - $b​$ es el factor de ramificación.
-- $C^\ast$ es el coste del camino de la solución óptima.
-- $\varepsilon$ es el coste mínimo de un acción.
+- $C^\ast​$ es el coste del camino de la solución óptima.
+- $\varepsilon​$ es el coste mínimo de un acción.
 
 **5. ¿Cuál es la complejidad temporal del algoritmo?**
 
-En este caso, por ser $A*$ el algoritmo, a complejidad espacial y la temporal coinciden, por lo que la fórmula sería exactamente la misma que en el apartado anterior.
-
-**6. Indicad qué partes del código se modificarían para limitar el número de veces que se puede utilizar la acción “navegar por agujeros de gusano” (bidireccionales).**
+En este caso, por ser $A^*$ el algoritmo, a complejidad espacial y la temporal coinciden, por lo que la fórmula sería exactamente la misma que en el apartado anterior.
