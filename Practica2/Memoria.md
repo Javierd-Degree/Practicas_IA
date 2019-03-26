@@ -345,3 +345,94 @@ insert-nodes-strategy (nodes, lst-nodes, strategy)
 ```
 
 ### Ejercicio 8
+
+En este apartado, al igual que en el ejercicio 5, simplemente hemos tenido que definir una estructura, con lo que no es necesaria ninguna batería de pruebas ni pseudo-código especial. Lo único a comentar sería la función de comparar nodos, que se basa simplemente en una modificación de la función `node-g-<=` dada en el enunciado, de forma que comparamos el campo *f* de ambos nodos, en vez de el campo *g*.
+
+### Ejercicio 9
+
+
+
+### Ejercicio 10
+
+
+
+### Ejercicio 11
+
+##### Batería de ejemplos
+
+
+
+##### Comentarios sobre la implementación
+
+Como hemos estructurado el programa de forma modular, basta con definir una nueva función de comparar nodos para recorrer el árbol de forma distinta, aplicando así otros algoritmos de búsqueda.
+
+En el caso de búsqueda en profundidad, los nodos se almacenan en una pila a medida que se descubren, de forma que basta con que la función `depth-first-node-compare-p` devuelva siempre un *True*, con lo la lista de abiertos actúa como una pila.
+
+Para la búsqueda en anchura, la lista de abiertos se tiene que comportar como una cola, añadiendo los nodos siempre al final. Para esto, basta con que la función `breadth-first-node-compare-p` devuelva siempre NIL, de forma que al insertar un nodo, este acaba siempre en el final de la lista.
+
+##### Pseudo-código
+
+Como hemos mencionado en el apartado anterior, el pseudo-código de las dos funciones sería:
+
+```
+depth-first-node-compare-p (node-1, node-2):
+	devolver True
+
+breadth-first-node-compare-p (node-1, node-2):
+	devolver NIL
+```
+
+
+
+### Ejercicio 12
+
+La heurística escogida es el coste del enlace más barato para salir de la ciudad.
+
+<span style="color:red">EXPLICAR POR QUÉ ES ADMISIBLE ETC, Y TIEMPOS</span>
+
+```commonlisp
+(defparameter *estimate-new*
+  '((Calais (0.0 0.0)) (Reims (25.0 15.0)) (Paris (30.0 10.0))
+    (Nancy (50.0 20.0)) (Orleans (55.0 38.0)) (St-Malo (65.0 15.0))
+    (Nantes (75.0 15.0)) (Brest (90.0 40.0)) (Nevers (70.0 20.0))
+    (Limoges (100.0 35.0)) (Roenne (85.0 5.0)) (Lyon (105.0 5.0))
+    (Toulouse (130.0 35.0)) (Avignon (135.0 10.0)) (Marseille (145.0 25.0))))
+```
+
+
+
+### Preguntas
+
+**1. ¿Por qué se ha realizado este diseño para resolver el problema de búsqueda?**
+
+Hemos implementado el problema de forma modular, dividido en funciones sencillas y cada una de ellas con un fin específico. 
+
+De este forma, es mucho más sencillo de programar y debuggear, y permite ser aplicado a cualquier grafo, con múltiples estrategias de búsqueda. Basta con definir las nuevas heurísticas, un test que permita comprobar si hemos alcanzado el estado final, y las acciones a aplicar a un estado para obtener sus sucesores.
+
+**2.A ¿Qué ventajas aporta?**
+
+Como hemos mencionado en el test anterior, la principal ventaja, además de la posibilidad de aplicar el algoritmo $A^*$ a otros problemas que necesitamos resolver, como se explica en el apartado siguiente, es la limpieza y claridad del código, que permite ser entendido fácil y rápidamente, de forma que se agiliza la solución de posibles errores.
+
+**2.B ¿Por qué se han utilizado funciones lambda para especificar el test objetivo, la heurística y los operadores del problema?**
+
+El uso de funciones lambda para estos tests permite que estas sean intercambiadas fácilmente, pudiendo aprovechar así los algoritmos principales (que son los más difíciles de programar) para obtener el camino óptimo en cualquier otro problema, sustituyendo simplemente estas funciones lambda y algunas estructuras como los nuevos problemas a usar.
+
+**3. Sabiendo que en cada nodo de búsqueda hay un campo “parent”, que proporciona una referencia al nodo a partir del cual se ha generado el actual ¿Es eficiente el uso de memoria?**
+
+
+
+**4. ¿Cuál es la complejidad espacial del algoritmo implementado?**
+
+Por ser $A^*$ el algoritmo, sabemos que la fórmula para calcular la complejidad espacial es
+
+$O(b^{\lceil C^\ast/\varepsilon\rceil})​$, donde:
+
+- $b​$ es el factor de ramificación.
+- $C^\ast$ es el coste del camino de la solución óptima.
+- $\varepsilon$ es el coste mínimo de un acción.
+
+**5. ¿Cuál es la complejidad temporal del algoritmo?**
+
+En este caso, por ser $A*$ el algoritmo, a complejidad espacial y la temporal coinciden, por lo que la fórmula sería exactamente la misma que en el apartado anterior.
+
+**6. Indicad qué partes del código se modificarían para limitar el número de veces que se puede utilizar la acción “navegar por agujeros de gusano” (bidireccionales).**
