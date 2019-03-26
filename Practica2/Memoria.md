@@ -350,11 +350,56 @@ En este apartado, al igual que en el ejercicio 5, simplemente hemos tenido que d
 
 ### Ejercicio 9
 
-##### Batería de ejemplso
+##### Batería de ejemplos
 
 ##### Comentarios sobre la implementación
 
 ##### Pseudocódigo
+
+```pseudocode
+a-star-search (problem):
+ 	return graph-search(problem, *A-star*)
+ 	
+ 	
+graph-search (problem, strategy):
+	return graph-search-aux(problem, list(root-node(problem)), NIL, strategy)
+	
+	
+root-node (problem):
+	crear_nodo(state = problem.initial-state,
+		parent = NIL,
+		action = NIL,
+		depth = 0,
+		g = 0,
+		h = problem.f-h(problem.initial-state))
+		f = problem.f-h(problem.initial-state))
+		
+		
+graph-search-aux (problem, open-nodes, closed-nodes, strategy):
+	si open-nodes está vacía:
+		return NIL
+	si no:
+		current-node := first(open-nodes)
+		si current-node es el nodo destino:
+			return current-node
+		si no:
+			rest-nodes := rest(open-nodes)
+			repeated-node := node-in-lst(current-node, closed-nodes, problem)
+			si repeated-node es nil (el nodo no esta en la lista de cerrados) o g(current-node) <= g(repeated-node):
+				return graph-search-aux(problem, insert-nodes-strategy(expand-node(current-node, problem), rest-nodes, strategy), cons(current-node, closed-nodes))
+			si no:
+				return graph-search-aux(problem, rest-nodes, closed-nodes, strategy)
+				
+
+node-in-lst(node, lst, problem):
+	si lst está vacía:
+		return NIL
+	si no:
+		si node es igual (en el problema) a first(lst):
+			return first(list)
+		si no:
+			return node-in-lst(node, rest(lst), problem)
+```
 
 
 
