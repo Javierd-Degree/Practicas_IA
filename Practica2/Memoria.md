@@ -596,9 +596,7 @@ El uso de funciones lambda para estos tests permite que estas sean intercambiada
 
 **4. ¿Cuál es la complejidad espacial del algoritmo implementado?**
 
-Por ser $A^*​$ el algoritmo, sabemos que la fórmula para calcular la complejidad espacial es
-
-$O(b^{\lceil C^\ast/\varepsilon\rceil})​$, donde:
+Por ser $A^*$ el algoritmo, sabemos que la fórmula para calcular la complejidad espacial es $O(b^{\lceil C^\ast/\varepsilon\rceil})$, donde:
 
 - $b​$ es el factor de ramificación.
 - $C^\ast​$ es el coste del camino de la solución óptima.
