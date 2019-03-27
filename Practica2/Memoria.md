@@ -396,9 +396,15 @@ Además de probar que funciona correctamente con el origen y las listas de ciuda
 
 ##### Comentarios sobre la implementación
 
+A la hora de implementar el funcionamiento pedido en este apartado, nos hemos basado en el pseudocódigo que se nos proporciona en el enunciado. Sin embargo, hemos decidido crear algunas funciones auxiliares para facilitarnos la implementación de este pseudocódigo y para evitar repetir código.
 
+Las funciones auxiliares que se han implementado son `root-node` que simplemente es una función que genera el nodo raíz de un problema , haciendo que su padre y su acción sea `nil`, su coste sea 0 y su estado el estado origen del problema; y la función `node-in-lst` que comprueba si un nodo está en una lista, esta segunda función va recorriendo la lista comparando el nodo con cada uno de los nodos de la lista mediante la función para comparar nodos en la estructura `problem`.
+
+Estas 2 funciones se emplean en las funciones `graph-search` y `graph-search-aux` que son las funciones pedidas y que siguen el pseudocódigo proporcionado.
 
 ##### Pseudocódigo
+
+Según lo comentado anteriormente, el pseudocódigo de las funciones implementadas en este apartado es: 
 
 ```
 a-star-search (problem):
