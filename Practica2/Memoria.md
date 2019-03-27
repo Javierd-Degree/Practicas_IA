@@ -352,21 +352,65 @@ En este apartado, al igual que en el ejercicio 5, simplemente hemos tenido que d
 
 ##### Batería de ejemplos
 
+Como el algoritmo se basa en la función de la heurística dada, que depende del destino, los únicos cambios que podemos hacer para comprobar la corrección del algoritmo se basan en cambiar el origen del trayecto y las listas de ciudades obligatorias y prohibidas.
+
+Además de probar que funciona correctamente con el origen y las listas de ciudades obligatorias y prohibidas dadas, hemos probado variando estos tres parámetros, los cuatro casos especiales que pueden causar problemas. A pesar de haber probado tanto con *fast* como con *cheap*, especificamos únicamente las de *fast*, por simplicidad de la memoria.
+
+- Prohibir una ciudad obligatoria a la que se pueda pasar únicamente por tren, por ejemplo, *Orleans*:
+
+    ```commonlisp
+    NIL
+    ```
+
+- Empezar directamente en la ciudad destino, con una ciudad obligatoria:
+
+    Hemos dejado *París* como ciudad obligatoria. El resultado es:
+
+    ```commonlisp
+    #S(NODE :STATE CALAIS
+       :PARENT
+       #S(NODE :STATE PARIS
+          :PARENT
+          #S(NODE :STATE CALAIS :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H 0.0
+             :F 0.0)
+          :ACTION
+          #S(ACTION :NAME NAVIGATE-TRAIN-TIME :ORIGIN CALAIS :FINAL PARIS
+             :COST 34.0)
+          :DEPTH 1 :G 34.0 :H 30.0 :F 64.0)
+       :ACTION
+       #S(ACTION :NAME NAVIGATE-TRAIN-TIME :ORIGIN PARIS :FINAL CALAIS :COST 34.0)
+       :DEPTH 2 :G 68.0 :H 0.0 :F 68.0) 
+    ```
+
+- Empezar directamente en la ciudad destino, sin ciudades obligatorias:
+
+    ```commonlisp
+    #S(NODE :STATE CALAIS :PARENT NIL :ACTION NIL :DEPTH 0 :G 0 :H 0.0 :F 0.0) 
+    ```
+
+- Prohibir ciudades de forma que el destino sea inalcanzable. Por ejemplo, empezando en *St-Malo*, podemos prohibir *Paris* y *Nantes*, de forma que el resultado es:
+
+    ```commonlisp
+    NIL
+    ```
+
 ##### Comentarios sobre la implementación
+
+
 
 ##### Pseudocódigo
 
-```pseudocode
+```
 a-star-search (problem):
- 	return graph-search(problem, *A-star*)
+ 	devolver graph-search(problem, *A-star*)
  	
  	
 graph-search (problem, strategy):
-	return graph-search-aux(problem, list(root-node(problem)), NIL, strategy)
+	devolver graph-search-aux(problem, list(root-node(problem)), NIL, strategy)
 	
 	
 root-node (problem):
-	crear_nodo(state = problem.initial-state,
+	devolver crear_nodo(state = problem.initial-state,
 		parent = NIL,
 		action = NIL,
 		depth = 0,
@@ -377,28 +421,28 @@ root-node (problem):
 		
 graph-search-aux (problem, open-nodes, closed-nodes, strategy):
 	si open-nodes está vacía:
-		return NIL
+		devolver NIL
 	si no:
 		current-node := first(open-nodes)
 		si current-node es el nodo destino:
-			return current-node
+			devolver current-node
 		si no:
 			rest-nodes := rest(open-nodes)
 			repeated-node := node-in-lst(current-node, closed-nodes, problem)
 			si repeated-node es nil (el nodo no esta en la lista de cerrados) o g(current-node) <= g(repeated-node):
-				return graph-search-aux(problem, insert-nodes-strategy(expand-node(current-node, problem), rest-nodes, strategy), cons(current-node, closed-nodes))
+				devolver graph-search-aux(problem, insert-nodes-strategy(expand-node(current-node, problem), rest-nodes, strategy), cons(current-node, closed-nodes))
 			si no:
-				return graph-search-aux(problem, rest-nodes, closed-nodes, strategy)
+				devolver graph-search-aux(problem, rest-nodes, closed-nodes, strategy)
 				
 
 node-in-lst(node, lst, problem):
 	si lst está vacía:
-		return NIL
+		devolver NIL
 	si no:
 		si node es igual (en el problema) a first(lst):
-			return first(list)
+			devolver first(list)
 		si no:
-			return node-in-lst(node, rest(lst), problem)
+			devolver node-in-lst(node, rest(lst), problem)
 ```
 
 
@@ -488,31 +532,27 @@ breadth-first-node-compare-p (node-1, node-2):
 	devolver NIL
 ```
 
-
-
 ### Ejercicio 12
 
 La heurística escogida es el coste del enlace más barato para salir de la ciudad.
 
 Sabemos que si una heurística es monótona, entonces es también admisible. Por tanto para comprobar si nuestra heurística es válida para solucionar el problema podemos comprobar si es monótona, y, si lo es, entonces será admisible para nuestro problema.
 
-Para probar que la heurística escogida es monótona sabemos que para serlo debe cumplir:
+Para probar que la heurística escogida es monótona, por definición, debe cumplir:
 $$
-h(x) ≤ g(x => x') + h(x')
+h(x) ≤ g(x \rightarrow x') + h(x')
 $$
-Donde `x'` es el nodo al que se quiere ir desde el nodo `x` y `g(x => x')` es el coste de ir de `x` a `x'`.
+Donde $x'$ es el nodo sucesor de $x$ al que se quiere ir, y $g(x \rightarrow x')$ es el coste de ir de $x$ a $x'$.
 
 Viendo los grafos que se nos proporcionan y analizando la heurística proporcionada vemos que la heurística de un nodo (el coste del enlace más barato para salir de él) será siempre mayor o igual al coste de ir desde ese nodo a cualquiera de los adyacentes, pues el coste para ir a alguno de los adyacentes será el coste de alguna de los enlaces que salen del nodo, y como heurística hemos cogido el menor de estos costes. Por lo tanto sabemos que:
 $$
-h(x) ≤ g(x => x')
+h(x) ≤ g(x \rightarrow x')
 $$
 Además de esto, al observar los grafos vemos que no existe ningún enlace cuyo coste sea negativo por lo que ningún nodo puede tener una heurística negativa, de esto deducimos que:
 $$
-h(x) ≤ g(x => x') ≤ g(x => x') + h(x')
+h(x) ≤ g(x \rightarrow x') ≤ g(x \rightarrow x') + h(x')
 $$
 Por lo tanto la heurística elegida cumple los requisitos para ser monótona, luego esta es también admisible.
-
-
 
 Aplicando esta heurística, el parámetro `*estimate-new*` queda de la siguiente manera:
 
