@@ -1075,36 +1075,6 @@ De esta forma, bastaría con modificar ligeramente la función *f-goal-test* de 
 ;;;    END Exercise 11
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;
-;;;    BEGIN Exercise 12
-;;;
-
-;;; La heurística escogida es el coste del enlace más barato para salir de la ciudad
-
-(defparameter *estimate-new*
-  '((Calais (0.0 0.0)) (Reims (25.0 15.0)) (Paris (30.0 10.0))
-    (Nancy (50.0 20.0)) (Orleans (55.0 38.0)) (St-Malo (65.0 15.0))
-    (Nantes (75.0 15.0)) (Brest (90.0 40.0)) (Nevers (70.0 20.0))
-    (Limoges (100.0 35.0)) (Roenne (85.0 5.0)) (Lyon (105.0 5.0))
-    (Toulouse (130.0 35.0)) (Avignon (135.0 10.0)) (Marseille (145.0 25.0))))
-
-(defparameter *travel-cost-new*
- (make-problem
-   :states *cities*
-   :initial-state *origin*
-   :f-h #'(lambda (state) (f-h-price state *estimate-new*))
-   :f-goal-test #'(lambda (node) (f-goal-test node *destination* *mandatory*))
-   :f-search-state-equal #'(lambda (node-1 node-2) (f-search-state-equal node-1 node-2 *mandatory*))
-   :operators (list
-                  #'(lambda (node) (navigate-canal-price (node-state node) *canals*))
-                  #'(lambda (node) (navigate-train-price (node-state node) *trains* *forbidden*)))))
-;;;
-;;;    END Exercise 12
-;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ```
 
 
