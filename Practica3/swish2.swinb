@@ -1,0 +1,57 @@
+<div class="notebook">
+
+<div class="nb-cell markdown" name="md1">
+### Ejercicio 5
+
+En el caso de ponerlo al reves, como *aplasta(R,  [a, b, c, d]).* la función devuelve false, porque no es ninguno de los casos base
+</div>
+
+<div class="nb-cell program" name="p1">
+aplasta([], []) :- !.
+aplasta([X|T], Res) :-
+    !,
+    aplasta(X, L1),
+    aplasta(T, L2),
+    append(L1, L2, Res).
+aplasta(L, [L]).
+
+
+</div>
+
+<div class="nb-cell markdown" name="md2">
+### Ejercicio 6
+Ejemplos: 
+next_factor(5, 2, NF) 3, el caso base
+next_factor(2, 5, NF) FALSE porque 5 &lt; sqrt(2)
+next_factor(2, 1, NF) 3
+next_factor(25, 3, NF) 5
+next_factor(25, 5, NF) false
+</div>
+
+<div class="nb-cell program" name="p2">
+next_factor(_, 2, 3).
+next_factor(N, F, NF):- F &lt; sqrt(N), NF is F + 2.
+
+primos_aux(1, [], _).
+primos_aux(N, [X|T], F) :- 
+    mod(N, F, 0),
+    F is X,
+    Nn is N/F,
+    primos_aux(Nn, [T], F).
+    
+primos_aux(N, [X|T], F) :- 
+   not mod(N, F, 0),
+    next_factor(N, F, Fn),
+    primos_aux(N, [X|T], Fn).
+
+primos(1, []).
+primos(N, L) :-
+    primos_aux(N, L, 2).
+    
+    
+    
+
+
+</div>
+
+</div>
