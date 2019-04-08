@@ -1,0 +1,61 @@
+<div class="notebook">
+
+<div class="nb-cell markdown" name="md1">
+### Ejercicio 8
+</div>
+
+<div class="nb-cell program" name="p1">
+build_tree([X], Y):-
+    Y = tree(X, nil, nil).
+build_tree([X|Rs], Y):-
+    L = tree(X, nil, nil),
+    build_tree(Rs, R),
+    Y = tree(1, L, R).
+    
+encode_elem(X, Y, T):-
+    Y = [],
+    T = tree(X, nil, nil).
+
+encode_elem(X, [1|Y], T):-
+    T = tree(1, _, R),
+    encode_elem(X, Y, R).
+
+encode_elem(X, [0], T):-
+    T = tree(1, L, _),
+    encode_elem(X, _, L).
+
+
+encode_list([X], [Y], T):-
+    encode_elem(X, Y, T).
+encode_list([X|R1], [Y|R2], T):-
+    encode_elem(X, Y, T),
+    encode_list(R1, R2, T).
+
+
+number_times(_, [], _).
+number_times(X, [X|R], N):-
+    N2 is N+1,
+    number_times(X, R, N2).
+number_times(X, [_|R], N):-
+    number_times(X, R, N).
+
+diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]).
+
+%ordena(L1, L2):
+    % comprobar que los elementos de L1 están en diccionario.
+    % aplastar L1
+    % ordenar la lista aplastada en L2 según el número de veces (number_times()) que el caracter está en L1.
+
+encode(L1, L2):-
+    ordena(L1, L),
+    build_tree(L, T),
+    encode_list(L1, L2, T).
+    
+
+    
+    
+    
+    
+</div>
+
+</div>

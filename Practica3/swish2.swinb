@@ -26,23 +26,31 @@ next_factor(2, 5, NF) FALSE porque 5 &lt; sqrt(2)
 next_factor(2, 1, NF) 3
 next_factor(25, 3, NF) 5
 next_factor(25, 5, NF) false
+
+primos(1, []) true, el caso base
+primos(4, [2, 2]) true
+primos(4, [2, 3]) false
+primos(63, [3, 3, 7]) true
+primos(63, [3, 3, 8]) false
+primos(63, L) [3, 3, 7]
+primos(4, L) [2, 2]
 </div>
 
 <div class="nb-cell program" name="p2">
 next_factor(_, 2, 3).
-next_factor(N, F, NF):- F &lt; sqrt(N), NF is F + 2.
+next_factor(N, F, NF):- F < sqrt(N), NF is F + 2.
+next_factor(N, F, N):- F < N.
 
 primos_aux(1, [], _).
-primos_aux(N, [X|T], F) :- 
-    mod(N, F, 0),
-    F is X,
+primos_aux(N, [F|T], F) :- 
+   	0 is mod(N, F),
     Nn is N/F,
-    primos_aux(Nn, [T], F).
+    primos_aux(Nn, T, F), !.
     
-primos_aux(N, [X|T], F) :- 
-   not mod(N, F, 0),
+primos_aux(N, L, F) :- 
+   0 \= mod(N, F),
     next_factor(N, F, Fn),
-    primos_aux(N, [X|T], Fn).
+    primos_aux(N, L, Fn).
 
 primos(1, []).
 primos(N, L) :-

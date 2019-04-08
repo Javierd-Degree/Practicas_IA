@@ -68,7 +68,7 @@ aplasta(L, [L]).
 
 ```
 
-### Ejercicio 6 - No funciona aún
+### Ejercicio 6 
 
 Ejemplos: 
 next_factor(5, 2, NF) 3, el caso base
@@ -77,24 +77,92 @@ next_factor(2, 1, NF) 3
 next_factor(25, 3, NF) 5
 next_factor(25, 5, NF) false
 
-```
+primos(1, []) true, el caso base
+primos(4, [2, 2]) true
+primos(4, [2, 3]) false
+primos(63, [3, 3, 7]) true
+primos(63, [3, 3, 8]) false
+primos(63, L) [3, 3, 7]
+primos(4, L) [2, 2]
+
 next_factor(_, 2, 3).
-next_factor(N, F, NF):- F &lt; sqrt(N), NF is F + 2.
+next_factor(N, F, NF):- F < sqrt(N), NF is F + 2.
+next_factor(N, F, N):- F < N.
 
 primos_aux(1, [], _).
-primos_aux(N, [X|T], F) :- 
-    mod(N, F, 0),
-    F is X,
+primos_aux(N, [F|T], F) :- 
+   	0 is mod(N, F),
     Nn is N/F,
-    primos_aux(Nn, [T], F).
+    primos_aux(Nn, T, F), !.
     
-primos_aux(N, [X|T], F) :- 
-   not mod(N, F, 0),
+primos_aux(N, L, F) :- 
+   0 \= mod(N, F),
     next_factor(N, F, Fn),
-    primos_aux(N, [X|T], Fn).
+    primos_aux(N, L, Fn).
 
 primos(1, []).
 primos(N, L) :-
     primos_aux(N, L, 2).
-```
 
+
+
+### Ejercicio 8
+
+#### 8.1
+
+build_tree([X], Y):-
+    Y = tree(X, nil, nil).
+build_tree([X|Rs], Y):-
+    L = tree(X, nil, nil),
+    build_tree(Rs, R),
+    Y = tree(1, L, R).
+
+
+
+#### 8.2
+
+encode_elem(X, Y, T):-
+    Y = [],
+    T = tree(X, nil, nil).
+
+encode_elem(X, [1|Y], T):-
+    T = tree(1, _, R),
+    encode_elem(X, Y, R).
+
+encode_elem(X, [0], T):-
+    T = tree(1, L, _),
+    encode_elem(X, _, L).
+
+
+
+#### 8.3
+
+encode_list([X], [Y], T):-
+    encode_elem(X, Y, T).
+encode_list([X|R1], [Y|R2], T):-
+    encode_elem(X, Y, T),
+    encode_list(R1, R2, T).
+
+
+
+#### 8.4 -Aún no funciona.
+
+number_times(_, [], _).
+number_times(X, [X|R], N):-
+    N2 is N+1,
+    number_times(X, R, N2).
+number_times(X, [_|R], N):-
+    number_times(X, R, N).
+
+diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]).
+
+%ordena(L1, L2):
+    % comprobar que los elementos de L1 están en diccionario.
+    % aplastar L1
+    % ordenar la lista aplastada en L2 según el número de veces (number_times()) que el caracter está en L1.
+
+encode(L1, L2):-
+    ordena(L1, L),
+    build_tree(L, T),
+    encode_list(L1, L2, T).
+    
