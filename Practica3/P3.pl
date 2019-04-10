@@ -50,8 +50,8 @@ concatena([X|L1], L2, [X|L3]):-concatena(L1, L2, L3).
 
 divide([X|T],1,[X],T).
 divide([X|T],N,L1,L2):-
-	N2 is N-1, 
-	divide(T, N2, H, L2), 
+	N2 is N-1,
+	divide(T, N2, H, L2),
 	concatena([X], H, L1).
 
 
@@ -70,9 +70,9 @@ aplasta(L, [L]).
 
 
 
-% Ejercicio 6 
+% Ejercicio 6
 
-%Ejemplos: 
+%Ejemplos:
 %next_factor(5, 2, NF) 3, el caso base
 %next_factor(2, 5, NF) FALSE porque 5 &lt; sqrt(2)
 %next_factor(2, 1, NF) 3
@@ -92,12 +92,12 @@ next_factor(N, F, NF):- F < sqrt(N), NF is F + 2.
 next_factor(N, F, N):- F < N.
 
 primos_aux(1, [], _).
-primos_aux(N, [F|T], F) :- 
+primos_aux(N, [F|T], F) :-
    	0 is mod(N, F),
     Nn is N/F,
     primos_aux(Nn, T, F), !.
-    
-primos_aux(N, L, F) :- 
+
+primos_aux(N, L, F) :-
    0 \= mod(N, F),
     next_factor(N, F, Fn),
     primos_aux(N, L, Fn).
@@ -111,7 +111,7 @@ primos(N, L) :-
 % Apartado 7.1
 cod_primero(X, L, Lrem, [X|T]):-
     cod_primero_aux(X, L, Lrem, T).
-                
+
 cod_primero_aux(_, [], [], []).
 cod_primero_aux(X, [X|T], Lrem, [X|Lfront]):-
     cod_primero_aux(X, T, Lrem, Lfront).
@@ -142,13 +142,14 @@ run_length_aux([X|T], [[Y,Z]|T2]):-
 
 % Apartado 8.1
 
-concatena2(X, Y, X-Y).	
+concatena2(X, Y, X-Y).
 
 build_tree([X], Y):-
-	concatena2(Y, _, X),
-    Y = tree(X, nil, nil).
+	Y = tree(Z, nil, nil),
+	concatena2(Z, _, X).
+
 build_tree([X|Rs], Y):-
-	concatena2(Z, _, X),
+		concatena2(Z, _, X),
     L = tree(Z, nil, nil),
     build_tree(Rs, R),
     Y = tree(1, L, R).
@@ -190,11 +191,11 @@ number_times(X, [X|R], [X, N]):-
 number_times(X, [_|R], [X, N]):-
     number_times(X, R, [X, N]).
 
-
-format_list(L1, L2):-
-	sort(L1, Aux),
-	
-
+times_list(_, [], []).
+times_list(L1, [X|Ls], [Y|L2]):-
+	number_times(X, L1, [E, N]),
+	Y = E-N,
+	times_list(L1, Ls, L2).
 
 
 diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]).
@@ -202,14 +203,20 @@ diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w
 
 ordena(L1, L2):-
 	sort(L1, Aux),
-	times_list(L1, Aux),
-	sort(2, @>=, Aux, L2).
+	times_list(L1, Aux, X),
+	sort(2, @>=, X, L2).
     %comprobar que los elementos de L1 están en diccionario.
     % aplastar L1
     % ordenar la lista aplastada en L2 según el número de veces (number_times()) que el caracter está en L1.
 
+admisible([]).
+admisible([X|R]):-
+  diccionario(L),
+	member(X, L),
+	admisible(R).
+
 encode(L1, L2):-
+		admisible(L1),
     ordena(L1, L),
     build_tree(L, T),
     encode_list(L1, L2, T).
-    
