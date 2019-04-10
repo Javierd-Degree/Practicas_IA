@@ -110,10 +110,6 @@ X = [_1486, _1492, _1498, _1504, _1504, _1498, _1492, _1486]
 X = [_832, _838, _844, _850, _856, _850, _844, _838, _832]
 X = [_908, _914, _920, _926, _932, _932, _926, _920, _914, _908]
 ```
-#### Pseudo-código
-
-
-
 #### Código
 
 ```
@@ -122,7 +118,7 @@ palindromo(L):-invierte(L, L).
 
 #### Comentarios sobre la implementación
 
-En el caso de esta función, su implementación se basa simplemente en llamar a la función *invierte* desarrollada en el apartado anterior, pues internamente realizan la misma función.
+En el caso de esta función, su implementación se basa simplemente en llamar a la función *invierte* desarrollada en el apartado anterior, pues internamente realizan la misma función. Por esta razón, consideramos que no es necesario realizar el pseudocódigo de la función, pues no aporta nada y empeora la lectura del texto.
 
 ### Ejercicio 4
 
@@ -139,9 +135,17 @@ En el caso de esta función, su implementación se basa simplemente en llamar a 
 ?- divide([1, 2, 3, 4, 5], 3, [1, 2], L2). %%% false
 ```
 
-
-
 #### Pseudo-código
+
+```
+divide(L, N, L1, L2):
+	X = primer_elem(L)
+	T = resto(L)
+	si (L1 == lista(X)) y (L2 == T) y (N == 1):
+		devolver true
+	si no:
+		devolver (existe H tal que satisface divide(T, N-1, H, L2)) y concatena(lista(X), H, L1)
+```
 
 #### Código
 
