@@ -19,6 +19,16 @@ En este caso, al ser la función tan simple, la batería de ejemplos es bastante
 Comprobamos que todos los ejemplos funcionan correctamente.
 
 #### Pseudo-código
+```
+duplica(L1, L2):
+    vacia(L1) y vacia(L2):
+        devolver true
+    si L1[0] == L2[0] == L2[1]:
+        devolver duplica(resto(L1), resto(resto(L2)))
+    si no:
+    devolver false
+
+```
 
 #### Código
 
@@ -53,6 +63,16 @@ Incluimos los ejemplos de prueba para las dos funciones que hemos desarrollado e
 De nuevo, tras ejecutar estos ejemplos comprobamos que la función es correcta.
 
 #### Pseudo-código
+Incluimos simplemente el pseudo-código de la función *invierte*, pues el código de *concatena* se nos da en el enunciado de la práctica.
+```
+invierte(L1, L2):
+		si vacio(L1) y vacio(L2):
+				devolver true
+		si no:
+				H = primer_elem(L1)
+				T = resto(L1)
+				devolver (R tal que satisface invierte(T, R)) y concatena(R, lista(H), L2)
+```
 
 #### Código
 
@@ -128,8 +148,8 @@ En el caso de esta función, su implementación se basa simplemente en llamar a 
 ```
 divide([X|T],1,[X],T).
 divide([X|T],N,L1,L2):-
-	N2 is N-1, 
-	divide(T, N2, H, L2), 
+	N2 is N-1,
+	divide(T, N2, H, L2),
 	concatena([X], H, L1).
 ```
 
@@ -140,6 +160,17 @@ En el caso de ponerlo al revés, como *aplasta(R,  [a, b, c, d]).* la función d
 #### Batería de ejemplos
 
 #### Pseudo-código
+```
+aplasta(L, Res):
+		si vacio(L) y vacio(Res):
+				devolver true
+		si Res == lista(L):
+				devolver true
+		si no:
+				L1 = lista aplastada de primer_elem(L)
+				L2 = lista aplastada de resto(L)
+				devolver concatenar(L1, L2) == Res
+```
 
 #### Código
 
@@ -151,10 +182,9 @@ aplasta([X|T], Res) :-
     aplasta(T, L2),
     append(L1, L2, Res).
 aplasta(L, [L]).
-
 ```
 
-### Ejercicio 6 
+### Ejercicio 6
 
 #### Batería de ejemplos
 
@@ -175,6 +205,34 @@ primos(4, L) [2, 2]
 ```
 
 #### Pseudo-código
+Definimos, como se indica en el enunciado, la función *next_factor*, además de otra función auxiliar, *primos_aux* que se encarga de hacer toda la recusión para obtener los divisores, de forma que *primos* se basa en comprobar si el numero es 1, y en caso contrario, llamar a *primos_aux* con el factor 2.
+```
+next_factor(N, F, NF):
+		si F==2 y NF==3:
+				return true
+		si (F < sqrt(N)) y (NF == F+2):
+				devolver true
+		si F < N:
+				devolver true
+		si no:
+				devolver false
+
+primos_aux(N, L, F):
+		si N == 1:
+				return true
+		si primer_elem(L) == F:
+				T = resto(L)
+				devolver ((N%F == 0) y primos_aux(N/F, T, F))
+		si no:
+				Fn = numero que satisface next_factor(N, F, Fn)
+				devolver (N%F != 0) y primos_aux(N, L, Fn)
+
+primos(N, L):
+		si (N == 1) y vacia(L):
+				devolver true
+		si no:
+			devolver primos_aux(N, L, 2)
+```
 
 #### Código
 
@@ -184,13 +242,13 @@ next_factor(N, F, NF):- F < sqrt(N), NF is F + 2.
 next_factor(N, F, N):- F < N.
 
 primos_aux(1, [], _).
-primos_aux(N, [F|T], F) :- 
+primos_aux(N, [F|T], F) :-
    	0 is mod(N, F),
     Nn is N/F,
     primos_aux(Nn, T, F), !.
-    
-primos_aux(N, L, F) :- 
-   0 \= mod(N, F),
+
+primos_aux(N, L, F) :-
+   	0\= mod(N, F),
     next_factor(N, F, Fn),
     primos_aux(N, L, Fn).
 
@@ -206,7 +264,7 @@ primos(N, L) :-
 #### 8.1
 
 ```
-concatena2(X, Y, X-Y).	
+concatena2(X, Y, X-Y).
 
 build_tree([X], Y):-
 	concatena2(Y, _, X),
@@ -278,4 +336,3 @@ encode(L1, L2):-
     ordena(L1, L),
     build_tree(L, T),
     encode_list(L1, L2, T).
-    
