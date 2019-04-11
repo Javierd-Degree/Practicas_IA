@@ -2,7 +2,7 @@
 
 ## Práctica 3
 
-En esta práctica, como el código de las funciones es muy simple y corto, incluimos el código directamente en cada apartado.
+En esta práctica, como el código de las funciones es muy simple y corto, lo incluimos directamente en cada apartado.
 
 ### Ejercicio 1
 
@@ -13,7 +13,10 @@ En este caso, al ser la función tan simple, la batería de ejemplos es bastante
 ```
 ?- duplica([1], [1, 1]). %%% true
 ?- duplica([1, 2, 3], [1, 1, 2, 2, 3, 3]). %%% true
+?- duplica([1, 2, 3], [1, 1, 2, 2, 3, 3, 4, 4]). %%% false
 ?- duplica([1, 2, 3], X). %%% X = [1, 1, 2, 2, 3, 3]
+?- duplica(L, [1, 1, 2, 2, 3, 3]). %%% L = [1, 2, 3]
+?- duplica(L, [1, 1, 2, 2, 3]). %%% false
 ```
 
 Comprobamos que todos los ejemplos funcionan correctamente.
@@ -31,6 +34,8 @@ duplica(L1, L2):
 ```
 
 #### Código
+
+El código de la función implementada sería por tanto el siguiente:
 
 ```
 duplica([], []).
@@ -57,7 +62,7 @@ Incluimos los ejemplos de prueba para las dos funciones que hemos desarrollado e
 ?- invierte([1], [1]). %%% true
 ?- invierte([1, 2], [2, 1]). %%% true
 ?- invierte([1, 2], [1, 2]). %%% false
-?- invierte([1, 2, 3], X) %%% X = [3, 2, 1]
+?- invierte([1, 2, 3], X). %%% X = [3, 2, 1]
 ```
 
 De nuevo, tras ejecutar estos ejemplos comprobamos que la función es correcta.
@@ -76,6 +81,8 @@ invierte(L1, L2):
 
 #### Código
 
+El código resultante de la función es el siguiente.
+
 ```
 concatena([], L, L).
 concatena([X|L1], L2, [X|L3]):-concatena(L1, L2, L3).
@@ -84,7 +91,10 @@ invierte([], []).
 invierte([H|T],L):-invierte(T,R),concatena(R,[H],L).
 ```
 
+Al igual que en el apartado anterior, no hay ningún comentario especial sobre la implementación, pues lo único difícil fue comprender el funcionamiento inicial de Prolog.
+
 ### Ejercicio 3
+
 #### Batería de ejemplos
 
 ```
@@ -137,6 +147,8 @@ En el caso de esta función, su implementación se basa simplemente en llamar a 
 
 #### Pseudo-código
 
+El pseudo-código de la función a desarrollar sería por tanto el siguiente:
+
 ```
 divide(L, N, L1, L2):
 	X = primer_elem(L)
@@ -157,11 +169,21 @@ divide([X|T],N,L1,L2):-
 	concatena([X], H, L1).
 ```
 
+Una vez programado, vemos que efectivamente funciona de la manera esperada, comprobando si L1 contiene los N primeros elementos de L, y L2 el resto. Además, por la lógica de *backtraking* empleada por Prolog, nos permite inferir L1 y/o L2 dados L y N, sin embargo, por la forma en la que está programado, no permite inferir N. Como no es algo pedido en el enunciado, consideramos que no es un problema.
+
 ### Ejercicio 5
 
-En el caso de ponerlo al revés, como *aplasta(R,  [a, b, c, d]).* la función devuelve false, porque no es ninguno de los casos base
-
 #### Batería de ejemplos
+
+```
+?- aplasta([[1]], [1]). %%% true
+?- aplasta([[1]], [[1]]). %%% false
+?- aplasta([[1], [1]], [1, 1]). %%% true
+?- aplasta([[1], [1]], [[1, 1]]). %%% false
+?- aplasta([1, [2, [3, 4], 5], [6, 7]], L) %%% L = [1, 2, 3, 4, 5, 6, 7].
+```
+
+En el caso de ponerlo al revés, como *aplasta(R,  [a, b, c, d])*, la función devuelve *false*, pues emplea el primer elemento de R, que no está inicializado en este caso.
 
 #### Pseudo-código
 ```
@@ -178,6 +200,8 @@ aplasta(L, Res):
 
 #### Código
 
+El código de nuestra función sería entonces:
+
 ```
 aplasta([], []) :- !.
 aplasta([X|T], Res) :-
@@ -192,20 +216,23 @@ aplasta(L, [L]).
 
 #### Batería de ejemplos
 
+Incluimos ejemplos para probar, en primer lugar, la función auxiliar *next_factor*, y posteriormente, la función principal *primos*.
+
 ```
-next_factor(5, 2, NF) %%%% 3, el caso base
-next_factor(2, 5, NF) %%% FALSE porque 5 &lt; sqrt(2)
-next_factor(2, 1, NF) %%% 3
-next_factor(25, 3, NF) %%% 5
-next_factor(25, 5, NF) %%% false
+next_factor(5, 2, 3) %%% true
+next_factor(5, 2, NF) %%% NF = 3
+next_factor(2, 5, 3) %%% false porque 5>sqrt(2)
+next_factor(2, 5, NF) %%% false porque 5>sqrt(2)
+next_factor(25, 3, NF) %%% NF = 5
+next_factor(25, 5, NF) %%% NF = 25. El último factor es él mismo, por si el número es primo. 
 
 primos(1, []) %%% true, el caso base
 primos(4, [2, 2]) %%% true
 primos(4, [2, 3]) %%% false
 primos(63, [3, 3, 7]) %%% true
 primos(63, [3, 3, 8]) %%% false
-primos(63, L) [3, 3, 7]
-primos(4, L) [2, 2]
+primos(63, L) %%% L = [3, 3, 7]
+primos(4, L) %%% L = [2, 2]
 ```
 
 #### Pseudo-código
@@ -241,22 +268,26 @@ primos(N, L):
 #### Código
 
 ```
-next_factor(_, 2, 3).
-next_factor(N, F, NF):- F < sqrt(N), NF is F + 2.
+next_factor(_, 2, 3) :- !.
+next_factor(N, F, NF):- 
+	F < sqrt(N), 
+	NF is F + 2,
+	!.
 next_factor(N, F, N):- F < N.
 
 primos_aux(1, [], _).
 primos_aux(N, [F|T], F) :-
    	0 is mod(N, F),
     Nn is N/F,
-    primos_aux(Nn, T, F), !.
+    primos_aux(Nn, T, F), 
+    !.
 
 primos_aux(N, L, F) :-
    	0\= mod(N, F),
     next_factor(N, F, Fn),
     primos_aux(N, L, Fn).
 
-primos(1, []).
+primos(1, []) :- !.
 primos(N, L) :-
     primos_aux(N, L, 2).
 ```

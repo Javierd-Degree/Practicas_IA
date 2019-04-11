@@ -44,7 +44,6 @@ palindromo(L):-invierte(L, L).
 
 % Ejercicio 4
 
-
 concatena([], L, L).
 concatena([X|L1], L2, [X|L3]):-concatena(L1, L2, L3).
 
@@ -56,9 +55,6 @@ divide([X|T],N,L1,L2):-
 
 
 % Ejercicio 5
-
-%En el caso de ponerlo al reves, como *aplasta(R,  [a, b, c, d]).* la función devuelve false, porque no es ninguno de los casos base
-
 
 aplasta([], []) :- !.
 aplasta([X|T], Res) :-
@@ -87,22 +83,26 @@ aplasta(L, [L]).
 %primos(63, L) [3, 3, 7]
 %primos(4, L) [2, 2]
 
-next_factor(_, 2, 3).
-next_factor(N, F, NF):- F < sqrt(N), NF is F + 2.
+next_factor(_, 2, 3) :- !.
+next_factor(N, F, NF):- 
+	F < sqrt(N), 
+	NF is F + 2,
+	!.
 next_factor(N, F, N):- F < N.
 
 primos_aux(1, [], _).
 primos_aux(N, [F|T], F) :-
    	0 is mod(N, F),
     Nn is N/F,
-    primos_aux(Nn, T, F), !.
+    primos_aux(Nn, T, F), 
+    !.
 
 primos_aux(N, L, F) :-
-   0 \= mod(N, F),
+   	0\= mod(N, F),
     next_factor(N, F, Fn),
     primos_aux(N, L, Fn).
 
-primos(1, []).
+primos(1, []) :- !.
 primos(N, L) :-
     primos_aux(N, L, 2).
 
