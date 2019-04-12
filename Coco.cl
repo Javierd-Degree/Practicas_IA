@@ -3,7 +3,7 @@
 (:export :heuristica :*alias*))
 (in-package 2302_P02_aaf45)
 
-(defvar *alias* '|Anacardo|)
+(defvar *alias* '|Coco|)
 
 (defun heuristica (estado)
 ; current player standpoint
