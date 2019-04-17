@@ -107,16 +107,15 @@ primos(N, L) :-
     primos_aux(N, L, 2).
 
 
-% Ejercicio 7 -- Aun no funciona bien
+% Ejercicio 7
 % Apartado 7.1
-cod_primero(X, L, Lrem, [X|T]):-
-    cod_primero_aux(X, L, Lrem, T).
+cod_primero(X, [], [], [X]).
+cod_primero(X, [Y|T], [Y|T], [X]) :-
+    Y\=X.
 
-cod_primero_aux(_, [], [], []).
-cod_primero_aux(X, [X|T], Lrem, [X|Lfront]):-
-    cod_primero_aux(X, T, Lrem, Lfront).
-cod_primero_aux(X, [Y|T], [Y|Lrem], Lfront):-
-    cod_primero_aux(X, T, Lrem, Lfront).
+cod_primero(X, [X|T], Lrem, [X|Lfront]) :-
+    !,
+    cod_primero(X, T, Lrem, Lfront).
 
 % Apartado 7.2
 cod_all([], []).
@@ -128,19 +127,22 @@ primero([], []).
 primero([X|_], X).
 
 % Apartado 7.3
+comprobar_tupla(L, [N, X]) :-
+    length(L, N),
+    nth0(0, L, X).
+    
 run_length(L, L1):-
-    cod_all(L, Ln),
-    run_length_aux(Ln, L1).
+    cod_all(L, Ls),
+    run_length_aux(Ls, L1).
 
 run_length_aux([], []).
-run_length_aux([X|T], [[Y,Z]|T2]):-
-    length(X, Y),
-    primero(X, Z),
-    run_length_aux(T, T2).
+run_length_aux([X|T], [[N,P]|S]):-
+    comprobar_tupla(X, [N, P]),
+    run_length_aux(T, S).
 
 % Ejercicio 8
 
-% Apartado 8.1
+% Apartado 8.0
 
 concatena2(X, Y, X-Y).
 
@@ -156,7 +158,7 @@ build_tree([X|Rs], Y):-
 
 
 
-% Apartado 8.2
+% Apartado 8.1
 
 encode_elem(X, Y, T):-
     Y = [],
@@ -172,7 +174,7 @@ encode_elem(X, [0], T):-
 
 
 
-% Apartado 8.3
+% Apartado 8.2
 
 encode_list([X], [Y], T):-
     encode_elem(X, Y, T).
@@ -182,7 +184,7 @@ encode_list([X|R1], [Y|R2], T):-
 
 
 
-% Apartado 8.4 -Aún no funciona.
+% Apartado 8.3
 
 number_times(X, [], [X, 0]).
 number_times(X, [X|R], [X, N]):-
@@ -211,12 +213,12 @@ ordena(L1, L2):-
 
 admisible([]).
 admisible([X|R]):-
-  diccionario(L),
+	diccionario(L),
 	member(X, L),
 	admisible(R).
 
 encode(L1, L2):-
-		admisible(L1),
+	admisible(L1),
     ordena(L1, L),
     build_tree(L, T),
     encode_list(L1, L2, T).

@@ -233,6 +233,7 @@ primos(63, [3, 3, 7]) %%% true
 primos(63, [3, 3, 8]) %%% false
 primos(63, L) %%% L = [3, 3, 7]
 primos(4, L) %%% L = [2, 2]
+primos(524287, L) %%% L = [524287], es un primo de Mersenne
 ```
 
 #### Pseudo-código
@@ -292,26 +293,209 @@ primos(N, L) :-
     primos_aux(N, L, 2).
 ```
 
+### Ejercicio 7
+
+#### Apartado 7.1
+
+##### Batería de ejemplos
+
+```
+?- cod_primero(1, [1, 2], [2], [1, 1]) %%% true
+?- cod_primero(1, [1, 1], [], [1, 1, 1]) %%% true
+?- cod_primero(1, [1, 1], Lrem, Lfront) %%% Lrem = [], Lfront = [1, 1, 1]
+?- cod_primero(1, [1, 2], [2], [1]) %%% false
+?- cod_primero(1, [1, 2], [1, 2], [1]) %%% false
+?- cod_primero(1, [1, 1, 2, 2], [2, 2], [1, 1, 1]) %%% true
+?- cod_primero(1, [1, 1, 2, 3], Lrem, Lfront) %%% Lrem = [2, 3], Lfront = [1, 1, 1]
+```
+
+Con estos ejemplos comprobamos que el código funciona como esperábamos.
+
+##### Pseudo-código
+
+Con estos ejemplos, podemos desarrollar el pseudo-código de la función, que sería el siguiente:
+
+```
+cod_primero(X, L, Lrem, Lfront):
+	si vacio(L) y vacio(Lrem) y (Lfront == lista(X)):
+		devolver true
+	si (L == Lrem) y (Lfront == lista(X)) y (primer_elem(L) != X):
+		devolver true
+	si no:
+		devolver cod_primero(X, resto(L), Lrem, resto(Lfront))
+```
+
+##### Código
+
+Y, a partir del pseudo-código del apartado anterior, obtenemos el código:
+
+```
+cod_primero(X, [], [], [X]).
+cod_primero(X, [Y|T], [Y|T], [X]) :-
+    Y\=X.
+
+cod_primero(X, [X|T], Lrem, [X|Lfront]) :-
+    !,
+    cod_primero(X, T, Lrem, Lfront).
+```
+
+##### Comentarios sobre la implementación
+
+En este caso no se han tenido que tomar decisiones importantes para la implementación del ejercicio. Fue bastante sencilla, exceptuando el conseguir que diera una única solución como válida, para lo que tuvimos que añadir la condición `cod_primero(X, [Y|T], [Y|T], [X]) :- Y\=X.`
+
+#### Apartado 7.2
+
+##### Batería de ejemplos
+
+Una vez desarrollada y probada la función anterior, esta es bastante simple, con lo que bastan unos pocos ejemplos para comprobar su funcionamiento:
+
+```
+?- cod_all([1, 1, 1], [[1, 1, 1]]) %%% true
+?- cod_all([1, 1, 1], L) %%% L = [[1, 1, 1]]
+?- cod_all([1, 1, 2, 2], [[1, 1], [2, 2]]) %%% true
+?- cod_all([1, 1, 2, 2], L) %%% L = [[1, 1], [2, 2]]
+?- cod_all([1, 1, 2, 3, 3, 3, 3], L) %%% L = [[1, 1], [2], [3, 3, 3, 3]]
+```
+
+De nuevo, vemos que el código es correcto.
+
+##### Pseudo-código
+
+El pseudo-código para esta función sería por tanto:
+
+```
+cod_all(L, L1):
+	si vacio(L) y vacio(L1):
+		devolver true
+	si no:
+		X = primer_elem(L)
+		Y = primer_elem(L1)
+		Si existe Lrem que satisface cod_primero(X, resto(L), Lrem, Y):
+			devolver cod_all(Lrem, resto(L1))
+		si no:
+			devolver false
+```
+
+##### Código
+
+Entonces, obtenemos el siguiente código.
+
+```
+cod_all([], []).
+cod_all([X|T], [Y|Lfront]):-
+    cod_primero(X, T, Lrem, Y),
+    cod_all(Lrem, Lfront).
+```
+
+##### Comentarios sobre la implementación
+
+Como hemos mencionado en el apartado de *Batería de ejemplos*, una vez desarrollada la función *cod_primero*, esta es muy sencilla, con lo que no hemos econtrado nada destacable en su implementación. 
+
+#### Apartado 7.3
+
+##### Batería de ejemplos
+
+De nuevo, bastan unos pocos ejemplos para comprobar si el código funciona o no correctamente, pues el único caso que se podría considerar "especial" es cuando solo hay un elemento en la lista.
+
+```
+?- run_length([1, 1, 1, 1], [[4, 1]]) %%% true
+?- run_length([1, 1, 1, 1], L) %%% L = [[4, 1]]
+?- run_length([1, 1, 1, 1, 2, 3, 3, 4, 4, 4, 4, 4, 5, 5], [[4, 1], [1, 2], [2, 3], [5, 4], [2, 5]]). %%% true
+?- run_length([1, 1, 1, 1, 2, 3, 3, 4, 4, 4, 4, 4, 5, 5], L). %%% L = [[4, 1], [1, 2], [2, 3], [5, 4], [2, 5]]
+```
+
+##### Pseudo-código
+
+Incluimos el pseudocódigo de la función principal pedida, junto con el de otras dos funciones auxiliares explicadas en el apartado *Comentarios sobre la implementación*:
+
+```
+run_length(L, L1):
+	Si existe Ls que satisface cod_all(L, Ls):
+		devolver run_length_aux(Ls, L1)
+    si no:
+    	devolver false
+    	
+run_length_aux(Ls, L1):
+	si vacio(Ls) y vacio(L1):
+		devolver true
+	si no:
+		X = primer_elem(Ls)
+		[N, P] = primer_elem(L1)
+		devolver comprobar_tupla(X, [N, P]) y run_length_aux(resto(Ls), resto(L1))
+		
+comprobar_tupla(L, [N, X]):
+	devolver (longitud(L) == N) y (L[0] == X)
+```
+
+
+
+##### Código
+
+```
+comprobar_tupla(L, [N, X]) :-
+    length(L, N),
+    nth0(0, L, X).
+    
+run_length(L, L1):-
+    cod_all(L, Ls),
+    run_length_aux(Ls, L1).
+
+run_length_aux([], []).
+run_length_aux([X|T], [[N,P]|S]):-
+    comprobar_tupla(X, [N, P]),
+    run_length_aux(T, S).
+```
+
+##### Comentarios sobre la implementación
+
+Cabe destacar en este ejemplo el uso de dos funciones auxiliares, de forma que *run_length* se encarga simplemente de llamar a *cod_all*, para obtener una lista por cada número distinto de la lista inicial, mientras que *run_length_aux* se encarga de comparar estas listas con las tuplas de L1, para lo que empleamos recursividad, y la segunda función auxiliar desarrollada: *comprobar_tupla*, encargada de comprobar que la longitud de la lista es la indicada en la tupla, y que el primer elemento de la lista es el indicado en la tupla, pues como dicha lista ha sido generada por *cod_all*, todos los elementos son el mismo.
 
 
 ### Ejercicio 8
 
-#### 8.1
+#### Apartado 8.0
+
+##### Batería de ejemplos
+
+En este caso, no incluimos en la batería de ejemplos los proporcionados en el enunciado, pues ya se ha comprobado que su funcionamiento es correcto, y al ocupar tanto espacio empeoran la lectura del texto.
+
+Los ejemplos básicos que determinan el correcto funcionamiento del código serían entonces:
+
+```
+
+```
+
+
+
+##### Pseudo-código
+
+##### Código
+
+El código de la función sería por tanto:
 
 ```
 concatena2(X, Y, X-Y).
 
 build_tree([X], Y):-
-	concatena2(Y, _, X),
-    Y = tree(X, nil, nil).
+	Y = tree(Z, nil, nil),
+	concatena2(Z, _, X).
+
 build_tree([X|Rs], Y):-
-	concatena2(Z, _, X),
+		concatena2(Z, _, X),
     L = tree(Z, nil, nil),
     build_tree(Rs, R),
     Y = tree(1, L, R).
 ```
 
-#### 8.2
+En la implementación de este ejercio ... ***ACABAR JAVI***
+
+#### Apartado 8.1
+
+##### Batería de ejemplos
+
+##### Pseudo-código
+
+##### Código
 
 ```
 encode_elem(X, Y, T):-
@@ -327,21 +511,15 @@ encode_elem(X, [0], T):-
     encode_elem(X, _, L).
 ```
 
+##### Comentarios sobre la implementación
 
+#### Apartado 8.2
 
-encode_elem(X, Y, T):-
-    Y = [],
-    T = tree(X, nil, nil).
+##### Batería de ejemplos
 
-encode_elem(X, [1|Y], T):-
-    T = tree(1, _, R),
-    encode_elem(X, Y, R).
+##### Pseudo-código
 
-encode_elem(X, [0], T):-
-    T = tree(1, L, _),
-    encode_elem(X, _, L).
-
-#### 8.3
+##### Código
 
 ```
 encode_list([X], [Y], T):-
@@ -351,23 +529,16 @@ encode_list([X|R1], [Y|R2], T):-
     encode_list(R1, R2, T).
 ```
 
-#### 8.4 -Aún no funciona.
+##### Comentarios sobre la implementación
 
-number_times(X, [], [X, 0]).
-number_times(X, [X|R], [X, N]):-
-    number_times(X, R, [X, N2]),
-    N is N2+1.
-number_times(X, [_|R], [X, N]):-
-    number_times(X, R, [X, N]).
 
-diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]).
 
-%ordena(L1, L2):
-    % comprobar que los elementos de L1 están en diccionario.
-    % eliminar duplicados L1
-    % ordenar la lista sin duplicados en L2 según el número de veces (number_times()) que el caracter está en L1.
+#### Apartado 8.3
 
-encode(L1, L2):-
-    ordena(L1, L),
-    build_tree(L, T),
-    encode_list(L1, L2, T).
+##### Batería de ejemplos
+
+##### Pseudo-código
+
+##### Código
+
+##### Comentarios sobre la implementación
