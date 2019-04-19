@@ -504,9 +504,16 @@ build_tree([X|Rs], Y):-
     L = tree(Z, nil, nil),
     build_tree(Rs, R),
     Y = tree(1, L, R).
+
 ```
 
-En la implementación de este ejercio ... ***ACABAR JAVI***
+##### Comentarios sobre la implementación
+
+En la implementación de este ejercicio hemos creado una función auxiliar `concatena2` que concatena 2 elementos X e Y de modo que queden de la forma "X-Y". Esta función se emplea para que la función `build_tree` reciba como argumento una lista cuyos elementos tienen el formato "A-B" donde B es el dato respecto al que se ordenará el árbol como en el ejemplo propuesto en el enunciado.
+
+A la hora de implementar `build_tree` se van generando los nodos hoja, y para generar los nodos intermedios se llama de nuevo a `build_tree` con el resto de la lista que se pasa como argumento.
+
+
 
 #### Apartado 8.1
 
@@ -526,8 +533,6 @@ encode_elem(X, Y, T):
 		devolver false
 ```
 
-
-
 ##### Código
 
 ```
@@ -546,6 +551,8 @@ encode_elem(X, [0], T):-
 
 ##### Comentarios sobre la implementación
 
+El método que sigue esta función para codificar el elemento es recorrer el árbol de acuerdo a los elementos de la lista Y (el elemento codificado), de este modo, si el primer elemento de Y es un 1 se baja por el nodo derecho, y si es un 0 por el izquierdo, tras lo cual se vuelve a llamar a la función con el resto de la lista y con el sub-árbol de la rama resultante. Si al terminar la lista Y nos encomtramos en el nodo con el elemento que buscamos, devolvemos true, si no, false.
+
 #### Apartado 8.2
 
 ##### Batería de ejemplos
@@ -560,10 +567,7 @@ encode_list(X, Y, Z):
 		return true
 	si no:
 		return false
-	
 ````
-
-
 
 ##### Código
 
@@ -577,7 +581,9 @@ encode_list([X|R1], [Y|R2], T):-
 
 ##### Comentarios sobre la implementación
 
+Para implementar esta función, simplemente vamos recorriendo la lista de elementos que se quieren codificar y vamos realizando un `encode_elem` de ellos y comprobamos que la lista resultado está compuesta por los elementos codificados en orden, y si es así devolvemos true.
 
+Para recorrer las listas simplemente realizamos el `encode_elem` sobre el primer elemento de la lista que se quiere codificar y el primer elemento de la lista resultado, y tras esto llamamos a la función `encode_list` con el resto de ambas listas para comprobar que esto se cumple para e resto de elementos de estas.
 
 
 
@@ -586,6 +592,7 @@ encode_list([X|R1], [Y|R2], T):-
 ##### Batería de ejemplos
 
 ##### Pseudo-código
+
 ```
 number_times(X, Y, Z):
 	si Y es lista vacía y Z es la tupla [X, 0]:
@@ -673,3 +680,16 @@ encode(L1, L2):-
 
 
 ##### Comentarios sobre la implementación
+
+Para implementar el funcionamiento pedido, hemos decidido implementar varias funciones auxiliares para que el código fuese mas simple, limpio y claro.
+
+La primera de estas funciones auxiliares es `number_times(X, Y, Z)` que comprueba que la tupla Z de la forma [X, N] cumple que N es el número de repeticiones de X en la lista Y, de este modo que introducimos una variable en el campo Z, la función nos devolverá una tupla con X y el número de repeticiones de este X en Y.
+
+Basándonos en esta implementamos la función `times_list(X, Y, Z)` que comprueba que en la lista Z están las tuplas que genera `number_times` con los elementos de la lista Y comprobando las repeticiones de estos en la lista X. De este modo si se introduce una variable en el campo Z, la función devolverá una lista con las tuplas correspondientes a los elementos de la lista Y con las repeticiones en la lista X. Además esta función ya no devuelve las tuplas en el formato [A, N], sino en el formato A-N que es el que queremos.
+
+otra función auxiliar es `ordena(X, Y)` que Comprueba que Y es la lista X sin repeticiones, con sus elementos en forma de tuplas de `times_list` ordenados de acuerdo a los N de estas tuplas y sin repeticiones. De este modo al introducir una variable en el campo Y la función devuelve la lista X ordenada de acuerdo al número de repeticiones de los elementos y sin elementos duplicados, todo ello en el formato adecuado "A-N".
+
+La última función auxiliar implementada es `admisible(X)` que emplea el predicado `diccionario` proporcionado en el enunciado, y comprueba que todos los elementos de la lista X pertenecen a la lista que devuelve este predicado, que es el alfabeto.
+
+Por último al implementar la función `encode(X,Y)`  comprobamos que los elementos de X sean admisibles, los ordenamos en una lista auxiliar con la función `ordena`, y generamos el árbol correspondiente a esta lista auxiliar con `build_tree`, tras esto comprobamos que la lista Y es la lista X codificada según `encode_list` con el árbol que hemos generado. De este modo si en el campo Y se introduce una variable, la función devuelve la lista X codificada como se nos pide en este apartado.
+
