@@ -205,11 +205,10 @@ diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w
 
 ordena(L1, L2):-
 	sort(L1, Aux),
-	times_list(L1, Aux, X),
+	invierte(Aux, Aux2),% Para que en caso de igual número de repeticiones se ordene igual que en el ejemplo propuesto.
+	times_list(L1, Aux2, X),
 	sort(2, @>=, X, L2).
-    %comprobar que los elementos de L1 están en diccionario.
-    % aplastar L1
-    % ordenar la lista aplastada en L2 según el número de veces (number_times()) que el caracter está en L1.
+    
 
 admisible([]).
 admisible([X|R]):-

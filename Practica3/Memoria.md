@@ -469,6 +469,25 @@ Los ejemplos básicos que determinan el correcto funcionamiento del código ser�
 
 ##### Pseudo-código
 
+```
+concatena2(X, Y, Z):
+	si Z = "X-Y":
+		devolver true
+	si no:
+		devolver false
+		
+build_tree(X, Y):
+	si X es una lista de un elemento de la forma "A-B" e Y es Tree(A, nil, nil):
+		devolver true.
+	si el primer elemento de X es de la forma "A-B", Y es de la forma tree(1, L, R) donde
+	L es tree(A, nil, nil) y build_tree(rest(X), R) es true, entonces:
+		devolver true.
+	si no:
+		devolver false
+```
+
+
+
 ##### Código
 
 El código de la función sería por tanto:
@@ -495,6 +514,20 @@ En la implementación de este ejercio ... ***ACABAR JAVI***
 
 ##### Pseudo-código
 
+```
+encode_elem(X, Y, T):
+	si Y es lista vacía y T es de la forma tree(X, nil, nil):
+		devolver true
+	si T es tree(1, _, R) donde encode_elem(X, rest(Y), T) es true:
+		devolver true
+	si Y es una lista con solo el elemento 0 y T es tree(1, L, _) donde encode_elem(X, _, L) es true:
+		devolver true
+	si no:
+		devolver false
+```
+
+
+
 ##### Código
 
 ```
@@ -519,6 +552,19 @@ encode_elem(X, [0], T):-
 
 ##### Pseudo-código
 
+````
+encode_list(X, Y, Z):
+	si X e Y son listas de un solo elemento y encode_elem(elemento(X), elemento(Y), Z) es true:
+		devolver true
+	si encode_elem(first(X), first(Y), Z) es true y encode_list(rest(X), rest(Y), z) tambien es true:
+		return true
+	si no:
+		return false
+	
+````
+
+
+
 ##### Código
 
 ```
@@ -533,12 +579,97 @@ encode_list([X|R1], [Y|R2], T):-
 
 
 
+
+
 #### Apartado 8.3
 
 ##### Batería de ejemplos
 
 ##### Pseudo-código
+```
+number_times(X, Y, Z):
+	si Y es lista vacía y Z es la tupla [X, 0]:
+		return true
+	Si first(Y) = X y Z es la tupla [X, N] donde N es Naux + 1 donde Naux cumple que number_times(X, rest(Y), [X, Naux]) es true:
+		return true
+	si Z es la tupla [X, N] donde N cumple que number_times(X, rest(Y), [X, N]) es true:
+		return true
+	si no:
+		return false
+		
+
+times_list(X, Y, Z):
+	si Y y Z son listas vacías:
+		return true
+	si number_times(first(Y), X, [E, N]) es true, donde E y N cumplen que first(Z) = E-N y times_list(X, rest(Y), rest(Z)) es true:
+		return true
+	si no:
+		return false
+		
+		
+ordena(X, Y):
+	si Y es X sin repeticiones y ordenada respecto al número de apariciones, y sus elementos tienen la forma "A, B", donde A es el elemento y B el número de apariciones:
+		return true
+	si no:
+		retun false
+		
+		
+admisible(X):
+	si X es lista vacía:
+		return true
+	si firts(X) pertenece a diccionario y rest(X) es admisible:
+		return true
+	si no:
+		return false
+		
+
+encode(X, Y):
+	si X es admisible, y encode_list(X, Y, T) es true donde T es el arbol resultado de build_tree(L, T) con L resultado de ordena(X, L):
+		return true
+	si no:
+		return false
+```
 
 ##### Código
+
+```commonlisp
+number_times(X, [], [X, 0]).
+number_times(X, [X|R], [X, N]):-
+    number_times(X, R, [X, N2]),
+    N is N2+1.
+number_times(X, [_|R], [X, N]):-
+    number_times(X, R, [X, N]).
+
+times_list(_, [], []).
+times_list(L1, [X|Ls], [Y|L2]):-
+	number_times(X, L1, [E, N]),
+	Y = E-N,
+	times_list(L1, Ls, L2).
+
+
+diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z]).
+
+
+ordena(L1, L2):-
+	sort(L1, Aux),
+	invierte(Aux, Aux2),% Para que en caso de igual número de repeticiones se ordene igual que en el ejemplo propuesto.
+	times_list(L1, Aux2, X),
+	sort(2, @>=, X, L2).
+    
+
+admisible([]).
+admisible([X|R]):-
+	diccionario(L),
+	member(X, L),
+	admisible(R).
+
+encode(L1, L2):-
+	admisible(L1),
+    ordena(L1, L),
+    build_tree(L, T),
+    encode_list(L1, L2, T).
+```
+
+
 
 ##### Comentarios sobre la implementación
