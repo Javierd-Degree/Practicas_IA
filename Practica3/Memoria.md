@@ -462,7 +462,14 @@ En este caso, no incluimos en la batería de ejemplos los proporcionados en el e
 Los ejemplos básicos que determinan el correcto funcionamiento del código serían entonces:
 
 ```
+?- build_tree([a-1, b-2, g-7, f-6, n-14], tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% true
 
+?- build_tree([a-1, b-2, g-7, f-6, n-14], tree(1, tree(a, nil, nil), tree(1, tree(b, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(g, nil, nil), tree(n, nil, nil))))))
+%% false
+
+?- build_tree([a-1, b-2, g-7, f-6, n-14], X)
+%% X = tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil)))))
 ```
 
 
@@ -519,6 +526,26 @@ A la hora de implementar `build_tree` se van generando los nodos hoja, y para ge
 
 ##### Batería de ejemplos
 
+De nuevo evitamos repetir los mismos ejemplos que se nos proporcionan en el enunciado para evitar redundancia con este. De este modo los ejemplos necesarios para probar el correcto funcionamiento de este apartado son:
+
+```
+encode_elem(g, [1, 0], tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% true
+
+encode_elem(g, [0], tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% false
+
+encode_elem(n, [0], tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% true
+
+encode_elem(n, X, tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% X = [0]
+
+encode_elem(g, X, tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% X = [1, 0]
+
+```
+
 ##### Pseudo-código
 
 ```
@@ -557,6 +584,28 @@ El método que sigue esta función para codificar el elemento es recorrer el ár
 
 ##### Batería de ejemplos
 
+Para probar el correcto funcionamiento de la función `encode_list` empleamos los siguientes ejemplos además de los proporcionados en el enunciado: 
+
+```
+encode_list([a, b, c, d, g], [1, 0], tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% false
+
+encode_list([a, b, f, g, n], [[1, 1, 1, 1], [1, 1, 1, 0], [1, 1, 0], [1, 0], [0]], 
+tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% true
+
+encode_list([a, b, f, g, n], [[0], [1, 1, 0], [1, 1, 0], [1, 0], [1, 1, 1, 0]], 
+tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% false
+
+encode_list([a, b, c, d, g], X, tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% false
+
+encode_list([a, b, f, g, n], X, tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil))))))
+%% X = [[1, 1, 1, 1], [1, 1, 1, 0], [1, 1, 0], [1, 0], [0]]
+
+```
+
 ##### Pseudo-código
 
 ````
@@ -590,6 +639,27 @@ Para recorrer las listas simplemente realizamos el `encode_elem` sobre el primer
 #### Apartado 8.3
 
 ##### Batería de ejemplos
+
+Por ultimo para probar que nuestra implementación de este ejercicio codifica correctamente empleamos los siguientes ejemplos de la función `encode`:
+
+```
+encode([e, n, u, n, l, u, g, a, r, d, e, l, a, m, a, n, c, h, a], [[1, 1, 1, 1, 0], [1, 0], [1, 1, 0], [1, 0], [1, 1, 1, 0], [1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 0], [0], [1, 1, 1, 1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 0], [1, 1, 1, 1, 0], [1, 1, 1, 0], [0], [1, 1, 1, 1, 1, 1, 0], [0], [1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 0], [0]]) 
+%% true
+
+encode([e, n, u, n, l, u, g, a, r, d, e, l, a, m, a, n, c, h, a], [[1, 1, 1, 1, 0], [1, 0], [1, 1, 0]])
+%% false
+
+encode([a, b, a, c, c, a, /], [[0], [1, 1], [0], [1, 0], [1, 0], [0]])
+%% false
+
+encode([e, n, u, n, l, u, g, a, r, d, e, l, a, m, a, n, c, h, a], X)
+%% X = [[1, 1, 1, 1, 0], [1, 0], [1, 1, 0], [1, 0], [1, 1, 1, 0], [1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 0], [0], [1, 1, 1, 1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 0], [1, 1, 1, 1, 0], [1, 1, 1, 0], [0], [1, 1, 1, 1, 1, 1, 0], [0], [1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 0], [0]]
+
+encode([a, b, a, c, c, a, /], X)
+%% false
+```
+
+
 
 ##### Pseudo-código
 
@@ -639,7 +709,7 @@ encode(X, Y):
 
 ##### Código
 
-```commonlisp
+```
 number_times(X, [], [X, 0]).
 number_times(X, [X|R], [X, N]):-
     number_times(X, R, [X, N2]),
