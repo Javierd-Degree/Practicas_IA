@@ -406,7 +406,7 @@ De nuevo, bastan unos pocos ejemplos para comprobar si el código funciona o no 
 
 ##### Pseudo-código
 
-Incluimos el pseudocódigo de la función principal pedida, junto con el de otras dos funciones auxiliares explicadas en el apartado *Comentarios sobre la implementación*:
+Incluimos el pseudo-código de la función principal pedida, junto con el de otras dos funciones auxiliares explicadas en el apartado *Comentarios sobre la implementación*:
 
 ```
 run_length(L, L1):
@@ -472,8 +472,6 @@ Los ejemplos básicos que determinan el correcto funcionamiento del código ser�
 %% X = tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, tree(f, nil, nil), tree(1, tree(b, nil, nil), tree(a, nil, nil)))))
 ```
 
-
-
 ##### Pseudo-código
 
 ```
@@ -492,8 +490,6 @@ build_tree(X, Y):
 	si no:
 		devolver false
 ```
-
-
 
 ##### Código
 
@@ -519,8 +515,6 @@ build_tree([X|Rs], Y):-
 En la implementación de este ejercicio hemos creado una función auxiliar `concatena2` que concatena 2 elementos X e Y de modo que queden de la forma "X-Y". Esta función se emplea para que la función `build_tree` reciba como argumento una lista cuyos elementos tienen el formato "A-B" donde B es el dato respecto al que se ordenará el árbol como en el ejemplo propuesto en el enunciado.
 
 A la hora de implementar `build_tree` se van generando los nodos hoja, y para generar los nodos intermedios se llama de nuevo a `build_tree` con el resto de la lista que se pasa como argumento.
-
-
 
 #### Apartado 8.1
 
@@ -548,6 +542,8 @@ encode_elem(g, X, tree(1, tree(n, nil, nil), tree(1, tree(g, nil, nil), tree(1, 
 
 ##### Pseudo-código
 
+Con estos ejemplos, podemos desarrollar el pseudo-código de este apartado, que sería el siguiente:
+
 ```
 encode_elem(X, Y, T):
 	si Y es lista vacía y T es de la forma tree(X, nil, nil):
@@ -561,6 +557,8 @@ encode_elem(X, Y, T):
 ```
 
 ##### Código
+
+Por último, una vez tenemos el pseudo-código del apartado anterior, basta con programarlo en prolog:
 
 ```
 encode_elem(X, Y, T):-
@@ -578,7 +576,7 @@ encode_elem(X, [0], T):-
 
 ##### Comentarios sobre la implementación
 
-El método que sigue esta función para codificar el elemento es recorrer el árbol de acuerdo a los elementos de la lista Y (el elemento codificado), de este modo, si el primer elemento de Y es un 1 se baja por el nodo derecho, y si es un 0 por el izquierdo, tras lo cual se vuelve a llamar a la función con el resto de la lista y con el sub-árbol de la rama resultante. Si al terminar la lista Y nos encomtramos en el nodo con el elemento que buscamos, devolvemos true, si no, false.
+El método que sigue esta función para codificar el elemento es recorrer el árbol de acuerdo a los elementos de la lista Y (el elemento codificado), de este modo, si el primer elemento de Y es un 1 se baja por el nodo derecho, y si es un 0 por el izquierdo, tras lo cual se vuelve a llamar a la función con el resto de la lista y con el sub-árbol de la rama resultante. Si al terminar la lista Y nos encontramos en el nodo con el elemento que buscamos, devolvemos true, si no, false.
 
 #### Apartado 8.2
 
@@ -634,8 +632,6 @@ Para implementar esta función, simplemente vamos recorriendo la lista de elemen
 
 Para recorrer las listas simplemente realizamos el `encode_elem` sobre el primer elemento de la lista que se quiere codificar y el primer elemento de la lista resultado, y tras esto llamamos a la función `encode_list` con el resto de ambas listas para comprobar que esto se cumple para e resto de elementos de estas.
 
-
-
 #### Apartado 8.3
 
 ##### Batería de ejemplos
@@ -659,9 +655,9 @@ encode([a, b, a, c, c, a, /], X)
 %% false
 ```
 
-
-
 ##### Pseudo-código
+
+En este caso, al ser una función más compleja, incluimos el pseudo-código de la función principal pedida, junto con el de otras cuatro funciones auxiliares explicadas en el apartado *Comentarios sobre la implementación*:
 
 ```
 number_times(X, Y, Z):
@@ -709,6 +705,8 @@ encode(X, Y):
 
 ##### Código
 
+El código de estas funciones sería por tanto:
+
 ```
 number_times(X, [], [X, 0]).
 number_times(X, [X|R], [X, N]):-
@@ -728,7 +726,7 @@ diccionario([a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w
 
 
 ordena(L1, L2):-
-	sort(L1, Aux),
+	sort(L1, Aux),	% Eliminamos repetidos
 	invierte(Aux, Aux2),% Para que en caso de igual número de repeticiones se ordene igual que en el ejemplo propuesto.
 	times_list(L1, Aux2, X),
 	sort(2, @>=, X, L2).
@@ -747,8 +745,6 @@ encode(L1, L2):-
     encode_list(L1, L2, T).
 ```
 
-
-
 ##### Comentarios sobre la implementación
 
 Para implementar el funcionamiento pedido, hemos decidido implementar varias funciones auxiliares para que el código fuese mas simple, limpio y claro.
@@ -757,7 +753,8 @@ La primera de estas funciones auxiliares es `number_times(X, Y, Z)` que comprueb
 
 Basándonos en esta implementamos la función `times_list(X, Y, Z)` que comprueba que en la lista Z están las tuplas que genera `number_times` con los elementos de la lista Y comprobando las repeticiones de estos en la lista X. De este modo si se introduce una variable en el campo Z, la función devolverá una lista con las tuplas correspondientes a los elementos de la lista Y con las repeticiones en la lista X. Además esta función ya no devuelve las tuplas en el formato [A, N], sino en el formato A-N que es el que queremos.
 
-otra función auxiliar es `ordena(X, Y)` que Comprueba que Y es la lista X sin repeticiones, con sus elementos en forma de tuplas de `times_list` ordenados de acuerdo a los N de estas tuplas y sin repeticiones. De este modo al introducir una variable en el campo Y la función devuelve la lista X ordenada de acuerdo al número de repeticiones de los elementos y sin elementos duplicados, todo ello en el formato adecuado "A-N".
+Otra función auxiliar es `ordena(X, Y)` que Comprueba que Y es la lista X sin repeticiones, con sus elementos en forma de tuplas de `times_list` ordenados de acuerdo a los N de estas tuplas y sin repeticiones. De este modo al introducir una variable en el campo Y la función devuelve la lista X ordenada de acuerdo al número de repeticiones de los elementos y sin elementos duplicados, todo ello en el formato adecuado "A-N". 
+Comentar que en esta función empleamos la función *invierte* implementada en un ejercicio anterior para darle la vuelta a la lista *Aux* resultado de *sort*, de modo que al hacer el segundo *sort*, los elementos que tengan el mismo número de apariciones en la lista queden en el mismo orden que en el ejemplo de ejecución que se nos proporciona en el enunciado, sin embargo, si eliminásemos el *invierte* la implementación sería igualmente válida.
 
 La última función auxiliar implementada es `admisible(X)` que emplea el predicado `diccionario` proporcionado en el enunciado, y comprueba que todos los elementos de la lista X pertenecen a la lista que devuelve este predicado, que es el alfabeto.
 
