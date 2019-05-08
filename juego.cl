@@ -98,17 +98,17 @@
   (format t "~%")
   (loop for i downfrom (1- (tablero-alto tablero)) to 0 do
 	(loop for j from 0 below (tablero-ancho tablero) do
-	      (format t "· · "))
-	(format t "·~%")
+	      (format t ". . "))
+	(format t ".~%")
 	(loop for j from 0 below (tablero-ancho tablero) do
 	      (let ((ficha (aref (tablero-casillas tablero) i j)))
 		(if (not ficha)
-		    (format t "·   ")
-		  (format t "· ~S " ficha))))
-	(format t "·~%"))
+		    (format t ".   ")
+		  (format t ". ~S " ficha))))
+	(format t ".~%"))
   (loop for j from 0 below (tablero-ancho tablero) do
-	(format t "· · "))
-  (format t "·~%")
+	(format t ". . "))
+  (format t ".~%")
   (loop for j from 0 below (tablero-ancho tablero) do
 	(format t " [~S]" j))
   (format t "~%"))
@@ -329,7 +329,7 @@
   (negamax-1 estado devolver-estado 0 profundidad-max f-eval))
 
 (defun negamax-1 (estado devolver-estado profundidad profundidad-max f-eval)
-  (if (>= profundidad profundidad-max)
+  (if (or (>= profundidad profundidad-max) (juego-terminado-p estado))
       (unless devolver-estado (funcall f-eval estado))
     (let ((estados-sucesores (generar-sucesores estado)))
       (if (null estados-sucesores)

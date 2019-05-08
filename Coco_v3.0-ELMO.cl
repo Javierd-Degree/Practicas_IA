@@ -1,81 +1,11 @@
-(use-package 'conecta4)
+(defpackage :2302_P02_aaf45;
+(:use :common-lisp :conecta4)
+(:export :heuristica :*alias*))
+(in-package 2302_P02_aaf45)
 
-(declaim #+sbcl(sb-ext:muffle-conditions style-warning))
+(defvar *alias* '|Coco_v3.0/ELMO|)
 
-;; -------------------------------------------------------------------------------
-;; Funciones de evaluación
-;; -------------------------------------------------------------------------------
-
-(defun f-eval-bueno (estado)
-  ; current player standpoint
-  (let* ((tablero (estado-tablero estado))
-	 (ficha-actual (estado-turno estado))
-	 (ficha-oponente (siguiente-jugador ficha-actual)))
-    (if (juego-terminado-p estado)
-	(let ((ganador (ganador estado)))
-	  (cond ((not ganador) 0)
-		((eql ganador ficha-actual) +val-max+)
-		(t +val-min+)))
-      (let ((puntuacion-actual 0)
-	    (puntuacion-oponente 0))
-	(loop for columna from 0 below (tablero-ancho tablero) do
-	      (let* ((altura (altura-columna tablero columna))
-		     (fila (1- altura))
-		     (abajo (contar-abajo tablero ficha-actual columna fila))
-		     (der (contar-derecha tablero ficha-actual columna fila))
-		     (izq (contar-izquierda tablero ficha-actual columna fila))
-		     (abajo-der (contar-abajo-derecha tablero ficha-actual columna fila))
-		     (arriba-izq (contar-arriba-izquierda tablero ficha-actual columna fila))
-		     (abajo-izq (contar-abajo-izquierda tablero ficha-actual columna fila))
-		     (arriba-der (contar-arriba-derecha tablero ficha-actual columna fila)))
-		(setf puntuacion-actual
-		      (+ puntuacion-actual
-			 (cond ((= abajo 0) 0)
-			       ((= abajo 1) 10)
-			       ((= abajo 2) 100)
-			       ((= abajo 3) 1000))
-			 (cond ((= der 0) 0)
-			       ((= der 1) 10)
-			       ((= der 2) 100)
-			       ((= der 3) 1000))
-			 (cond ((= izq 0) 0)
-			       ((= izq 1) 10)
-			       ((= izq 2) 100)
-			       ((= izq 3) 1000))
-			 (cond ((= abajo-izq 0) 0)
-			       ((= abajo-izq 1) 10)
-			       ((= abajo-izq 2) 100)
-			       ((= abajo-izq 3) 1000)))))
-	      (let* ((altura (altura-columna tablero columna))
-		     (fila (1- altura))
-		     (abajo (contar-abajo tablero ficha-oponente columna fila))
-		     (der (contar-derecha tablero ficha-oponente columna fila))
-		     (izq (contar-izquierda tablero ficha-oponente columna fila))
-		     (abajo-der (contar-abajo-derecha tablero ficha-oponente columna fila))
-		     (arriba-izq (contar-arriba-izquierda tablero ficha-oponente columna fila))
-		     (abajo-izq (contar-abajo-izquierda tablero ficha-oponente columna fila))
-		     (arriba-der (contar-arriba-derecha tablero ficha-oponente columna fila)))
-		(setf puntuacion-oponente
-		      (+ puntuacion-oponente
-			 (cond ((= abajo 0) 0)
-			       ((= abajo 1) 10)
-			       ((= abajo 2) 100)
-			       ((= abajo 3) 1000))
-			 (cond ((= der 0) 0)
-			       ((= der 1) 10)
-			       ((= der 2) 100)
-			       ((= der 3) 1000))
-			 (cond ((= izq 0) 0)
-			       ((= izq 1) 10)
-			       ((= izq 2) 100)
-			       ((= izq 3) 1000))
-			 (cond ((= abajo-izq 0) 0)
-			       ((= abajo-izq 1) 10)
-			       ((= abajo-izq 2) 100)
-			       ((= abajo-izq 3) 1000))))))
-	(- puntuacion-actual puntuacion-oponente)))))
-
-(defun f-eval-mod (estado)
+(defun heuristica (estado)
 ; current player standpoint
   (let* ((tablero (estado-tablero estado))
 	 (ficha-actual (estado-turno estado))
@@ -104,36 +34,15 @@
 		     (diag-des (diagonal-descendente tablero ficha-actual columna fila)))
 		(setf puntuacion-actual
 		      (+ puntuacion-actual
-		      	(if (eql (obtener-ficha tablero 3 0) ficha-actual)
-		      		1000
-		      		0)
-		      	(if (not (dentro-del-tablero-p tablero columna fila))
-		      		0
-			      	(+
-			      		(if (and (= columna 3) (eql (obtener-ficha tablero columna fila) ficha-actual))
-		      				500
-		      				0)
-		      			(if (and (= columna 2) (eql (obtener-ficha tablero columna fila) ficha-actual))
-		      				200
-		      				0)
-		      			(if (and (= columna 4) (eql (obtener-ficha tablero columna fila) ficha-actual))
-		      				200
-		      				0)
-		      			(if (and (= columna 1) (eql (obtener-ficha tablero columna fila) ficha-actual))
-		      				100
-		      				0)
-		      			(if (and (= columna 5) (eql (obtener-ficha tablero columna fila) ficha-actual))
-		      				100
-		      				0)))
-
 		      	(if (< esp-v 4)
 		      		0
 		      		(+
 			      		(cond ((= ver 0) 0)
 				       		((= ver 1) 10)
 				       		((= ver 2) 300)
-				       		((= ver 3) 1000))
-			      		(* contar-v 50)))
+				       		((= ver 3) 1500))
+			      		(* contar-v 200)
+			      		(* (- esp-v 4) 300)))
 
 		      	(if (< esp-h 4)
 		      		0
@@ -141,8 +50,9 @@
 			      		(cond ((= hor 0) 0)
 				       		((= hor 1) 10)
 				       		((= hor 2) 300)
-				       		((= hor 3) 1000))
-			      		(* contar-h 50)))
+				       		((= hor 3) 1500))
+			      		(* contar-h 200)
+			      		(* (- esp-h 4) 300)))
 
 		      	(if (< esp-da 4)
 		      		0
@@ -150,8 +60,9 @@
 			      		(cond ((= diag-asc 0) 0)
 				       		((= diag-asc 1) 10)
 				       		((= diag-asc 2) 300)
-				       		((= diag-asc 3) 1000))
-			      		(* contar-da 50)))
+				       		((= diag-asc 3) 1500))
+			      		(* contar-da 200)
+			      		(* (- esp-da 4) 300)))
 
 		      	(if (< esp-dd 4)
 		      		0
@@ -159,8 +70,9 @@
 			      		(cond ((= diag-des 0) 0)
 				       		((= diag-des 1) 10)
 				       		((= diag-des 2) 300)
-				       		((= diag-des 3) 1000))
-			      		(* contar-dd 50))))))
+				       		((= diag-des 3) 1500))
+			      		(* contar-dd 200)
+			      		(* (- esp-dd 4) 300))))))
 	      (let* ((altura (altura-columna tablero columna))
 		     (fila (1- altura))
 		     (contar-v (contar-vertical tablero ficha-oponente columna fila))
@@ -177,32 +89,15 @@
 		     (diag-des (diagonal-descendente tablero ficha-oponente columna fila)))
 		(setf puntuacion-oponente
 		      (+ puntuacion-oponente
-		      	(if (not (dentro-del-tablero-p tablero columna fila))
-		      		0
-			      	(+
-			      		(if (and (= columna 3) (eql (obtener-ficha tablero columna fila) ficha-oponente))
-		      				500
-		      				0)
-		      			(if (and (= columna 2) (eql (obtener-ficha tablero columna fila) ficha-oponente))
-		      				200
-		      				0)
-		      			(if (and (= columna 4) (eql (obtener-ficha tablero columna fila) ficha-oponente))
-		      				200
-		      				0)
-		      			(if (and (= columna 1) (eql (obtener-ficha tablero columna fila) ficha-oponente))
-		      				100
-		      				0)
-		      			(if (and (= columna 5) (eql (obtener-ficha tablero columna fila) ficha-oponente))
-		      				100
-		      				0)))
 		      	(if (< esp-v 4)
 		      		0
 		      		(+
 			      		(cond ((= ver 0) 0)
 				       		((= ver 1) 10)
 				       		((= ver 2) 300)
-				       		((= ver 3) 1000))
-			      		(* contar-v 50)))
+				       		((= ver 3) 1500))
+			      		(* contar-v 200)
+			      		(* (- esp-v 4) 300)))
 
 		      	(if (< esp-h 4)
 		      		0
@@ -210,8 +105,9 @@
 			      		(cond ((= hor 0) 0)
 				       		((= hor 1) 10)
 				       		((= hor 2) 300)
-				       		((= hor 3) 1000))
-			      		(* contar-h 50)))
+				       		((= hor 3) 1500))
+			      		(* contar-h 200)
+			      		(* (- esp-h 4) 300)))
 
 		      	(if (< esp-da 4)
 		      		0
@@ -219,8 +115,9 @@
 			      		(cond ((= diag-asc 0) 0)
 				       		((= diag-asc 1) 10)
 				       		((= diag-asc 2) 300)
-				       		((= diag-asc 3) 1000))
-			      		(* contar-da 50)))
+				       		((= diag-asc 3) 1500))
+			      		(* contar-da 200)
+			      		(* (- esp-da 4) 300)))
 
 		      	(if (< esp-dd 4)
 		      		0
@@ -228,8 +125,9 @@
 			      		(cond ((= diag-des 0) 0)
 				       		((= diag-des 1) 10)
 				       		((= diag-des 2) 300)
-				       		((= diag-des 3) 1000))
-			      		(* contar-dd 50)))))))		 
+				       		((= diag-des 3) 1500))
+			      		(* contar-dd 200)
+			      		(* (- esp-dd 4) 300)))))))		 
 	(- puntuacion-actual puntuacion-oponente)))))
 
 
@@ -454,38 +352,3 @@
 			(contar-abajo-derecha-espacios tablero ficha (+ columna 1) (- fila 1) (+ valor 1) (+ num 1))
 			valor)))
 
-;; -------------------------------------------------------------------------------
-;; Jugadores
-;; -------------------------------------------------------------------------------
-
-(defvar *jugador-aleatorio* (make-jugador :nombre 'Jugador-aleatorio
-					  :f-jugador #'f-jugador-aleatorio
-					  :f-eval  #'f-eval-aleatoria))
-
-(defvar *jugador-bueno* (make-jugador :nombre 'Jugador-bueno
-				      :f-jugador #'f-jugador-negamax
-				      :f-eval  #'f-eval-bueno))
-
-(defvar *jugador-humano* (make-jugador :nombre 'Jugador-humano
-				       :f-jugador #'f-jugador-humano
-				       :f-eval  #'f-no-eval))
-
-(defvar *jugador-mod* (make-jugador :nombre 'Jugador-mod
-				      :f-jugador #'f-jugador-negamax
-				      :f-eval  #'f-eval-mod))
-;; -------------------------------------------------------------------------------
-;; Algunas partidas de ejemplo:
-;; -------------------------------------------------------------------------------
-
-(setf *verbose* t)
-
-;(print (partida *jugador-aleatorio* *jugador-aleatorio*))
-;(print (partida *jugador-aleatorio* *jugador-bueno* 4))
-;(print (partida *jugador-bueno* *jugador-aleatorio* 4))
-;(print (partida *jugador-bueno* *jugador-bueno* 4))
-;(print (partida *jugador-humano* *jugador-humano*))
-;(print (partida *jugador-humano* *jugador-aleatorio* 4))
-;(print (partida *jugador-humano* *jugador-bueno* 4))
-;(print (partida *jugador-aleatorio* *jugador-humano*))
-(print (partida *jugador-humano* *jugador-mod* 4))
-;;
